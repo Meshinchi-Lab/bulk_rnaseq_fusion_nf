@@ -5,7 +5,7 @@
 fqs_ch = Channel.fromPath(file(params.sample_sheet))
 						.splitCsv(header: true, sep: '\t')
 						.map { sample -> [sample["Sample"], file(sample["R1"]), file(sample["R2"])]}
-genome_lib = params.genome_lib_dir
+genome_lib = params.genome_lib
 
 // define the output directory .
 params.output_folder = "./starfusion/"
