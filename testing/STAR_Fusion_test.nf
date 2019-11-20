@@ -4,9 +4,10 @@
 fqs_ch = Channel.fromPath(file(params.sample_sheet))
 						.splitCsv(header: true, sep: '\t')
 						.map { sample -> [sample["Sample"], file(sample["R1"]), file(sample["R2"])]}
-//fqs_ch.subscribe{ println "${it}\n" }
+fqs_ch.subscribe{ println "${it}\n" }
 genome_lib = params.genome_lib
 
+/*
 // define the output directory .
 params.output_folder = "./starfusion/"
 
@@ -16,7 +17,7 @@ process STAR_Fusion_test {
 	publishDir "$params.output_folder/"
 
 	// use TrinityCTAT repo on docker hub.
-	container "trinityctat/starfusion:1.8.1"
+	container "trinityctat/starfusion:latest"
 	cpus 4
 	memory "30 GB"
 
@@ -34,8 +35,11 @@ process STAR_Fusion_test {
 
 	"""
 	set -eou pipefail
-	echo $genome_lib
-	ls -alh $genome_lib
+	ls -alh
+	export CTAT_GENOME_LIB=\$PWD/$genome_lib
+	echo \$CTAT_GENOME_LIB
+	echo \$STAR_FUSION_HOME
 	find . -name "AnnotFilterRule.pm"
 	"""
 }
+*/

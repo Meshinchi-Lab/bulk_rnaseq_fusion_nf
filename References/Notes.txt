@@ -5,6 +5,9 @@
 
 
 #Defining tuples requires TWO different declarations of file(). Must use .map() function as well.
+#The first file() is when the filename is read in from the sample sheet.
+#Then it needs to be declared a second time under `input: tuple val(Sample), file(R1), file(R2) from fqs_ch`
+
 #Example DOES NOT WORK!
 fqs_ch = Channel.fromPath(file(params.sample_sheet)).splitCsv(header: true, sep: '\t')
 fqs_ch.subscribe{ println "${it}\n" }
@@ -38,3 +41,12 @@ nxf_s3_download() {
 
 #For a recursive ls with limited depth in bash
 find . -maxdepth 3 -type d -ls
+
+#Useful for parsing S3 working(temporary) directory
+#From Sam Minot
+aws s3 ls --recursive s3://fh-pi-meshinchi-s/SR/work/ | grep .command.err | sort | grep 2019-11-14 | sed 's/.* //' | while read url; do aws s3 cp s3://fh-pi-meshinchi-s/$url - ; sleep 1; done
+aws s3 ls --recursive s3://fh-pi-meshinchi-s/SR/work/ | grep .command.sh | sort | grep 2019-11-14 | sed 's/.* //' | while read url; do aws s3 cp s3://fh-pi-meshinchi-s/$url - ; sleep 1; done
+
+
+export CTAT_GENOME_LIB=\$PWD/$genome_lib
+--FusionInspector inspect or validate

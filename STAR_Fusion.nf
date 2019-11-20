@@ -16,12 +16,12 @@ process STAR_Fusion {
 	publishDir "$params.output_folder/"
 
 	// use TrinityCTAT repo on docker hub.
-	container "trinityctat/starfusion:1.8.1"
+	container "trinityctat/starfusion:latest"
 	cpus 8
 	memory "60 GB"
 
 	// if process fails, retry running it
-	errorStrategy "retry"
+	errorStrategy "terminate"
 
 	// declare the input types and its variable names
 	input:
@@ -32,14 +32,14 @@ process STAR_Fusion {
 	output:
 	file "*"
 
-
 	"""
 	set -eou pipefail
+	echo \$PWD/$genome_lib
 
 	/usr/local/src/STAR-Fusion/STAR-Fusion --left_fq $R1 --right_fq $R2 \
-		--genome_lib_dir $genome_lib  \
+		--genome_lib_dir \$PWD/$genome_lib  \
 		--CPU 8 \
-		--FusionInspector validate \
+		--FusionInspector inspect \
 		--examine_coding_effect
 	"""
 }
