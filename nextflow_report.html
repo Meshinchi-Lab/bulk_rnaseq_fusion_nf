@@ -18,11 +18,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="Nextflow workflow report for run id [jovial_mayer]">
+  <meta name="description" content="Nextflow workflow report for run id [angry_woese]">
   <meta name="author" content="Paolo Di Tommaso, Phil Ewels">
   <link rel="icon" type="image/png" href="https://www.nextflow.io/img/favicon.png" />
 
-  <title>[jovial_mayer] Nextflow Workflow Report</title>
+  <title>[angry_woese] Nextflow Workflow Report</title>
 
   <style type="text/css">
   /*!
@@ -137,7 +137,7 @@ table.DTCR_clonedTable.dataTable{position:absolute !important;background-color:r
         <li class="nav-item"><a class="nav-link" href="#tasks">Tasks</a></li>
       </ul>
       <span class="navbar-text">
-        [jovial_mayer]
+        [angry_woese]
       </span>
     </div>
   </nav>
@@ -146,32 +146,35 @@ table.DTCR_clonedTable.dataTable{position:absolute !important;background-color:r
     <div class="container">
 
       <h1 class="display-3">Nextflow workflow report</h1>
-      <h2 class="text-muted mb-4"><samp>[jovial_mayer]</samp> <em>(resumed run)</em></h2>
+      <h2 class="text-muted mb-4"><samp>[angry_woese]</samp> <em>(resumed run)</em></h2>
 
       
-          <div class="alert alert-success mb-4">
-              Workflow execution completed successfully!
+          <div class="alert alert-danger mb-4">
+              <h4>Workflow execution completed unsuccessfully!</h4>
+              <p>The exit status of the task that caused the workflow execution to fail was: <code>null</code>.</p>
+              <p>The full error message was:</p>
+              <pre>Unable to execute HTTP request: batch.us-west-2.amazonaws.com</pre>
           </div>
       
 
       <dl>
         <dt>Run times</dt>
         <dd>
-          <span id="workflow_start">14-Nov-2019 16:49:24</span> - <span id="workflow_complete">14-Nov-2019 17:35:08</span>
-          (<span id="completed_fromnow"></span>duration: <strong>45m 44s</strong>)
+          <span id="workflow_start">20-Dec-2019 17:06:40</span> - <span id="workflow_complete">20-Dec-2019 19:10:59</span>
+          (<span id="completed_fromnow"></span>duration: <strong>2h 4m 19s</strong>)
         </dd>
 
         <dl>
           <div class="progress" style="height: 1.6rem; margin: 1.2rem auto; border-radius: 0.20rem;">
-            <div style="width: 100.0%" class="progress-bar bg-success" data-toggle="tooltip" data-placement="top" title="2 tasks succeeded"><span class="text-truncate">&nbsp; 2 succeeded &nbsp;</span></div>
+            <div style="width: 0.0%" class="progress-bar bg-success" data-toggle="tooltip" data-placement="top" title="0 tasks succeeded"><span class="text-truncate">&nbsp; 0 succeeded &nbsp;</span></div>
             <div style="width: 0.0%" class="progress-bar bg-secondary" data-toggle="tooltip" data-placement="top" title="0 tasks were cached"><span class="text-truncate">&nbsp; 0 cached &nbsp;</span></div>
             <div style="width: 0.0%" class="progress-bar bg-warning" data-toggle="tooltip" data-placement="top" title="0 tasks reported and error and were ignored"><span class="text-truncate">&nbsp; 0 ignored &nbsp;</span></div>
-            <div style="width: 0.0%" class="progress-bar bg-danger" data-toggle="tooltip" data-placement="top" title="0 tasks failed"><span class="text-truncate">&nbsp; 0 failed &nbsp;</span></div>
+            <div style="width: 100.0%" class="progress-bar bg-danger" data-toggle="tooltip" data-placement="top" title="1 tasks failed"><span class="text-truncate">&nbsp; 1 failed &nbsp;</span></div>
           </div>
         </dl>
 
         <dt>Nextflow command</dt>
-        <dd><pre class="nfcommand"><code>nextflow run -c /Users/jlsmith3/nextflow.config STAR_Fusion_test.nf --sample_sheet sample_sheet.txt --genome_lib 's3://fh-pi-meshinchi-s/SR/starfusion/GRCh37_gencode_v19_CTAT_lib_Oct012019/ctat_genome_lib_build_dir' --output_folder 's3://fh-pi-meshinchi-s/SR/starfusion/test' -with-report nextflow_report.html -work-dir 's3://fh-pi-meshinchi-s/SR/work' -cache TRUE -resume</code></pre></dd>
+        <dd><pre class="nfcommand"><code>nextflow run -c /Users/jlsmith3/nextflow.config STAR_Fusion.nf --sample_sheet sample_sheets/sample_sheet.txt --genome_lib 's3://fh-pi-meshinchi-s/SR/starfusion/GRCh37_gencode_v19_CTAT_lib_Oct012019/ctat_genome_lib_build_dir' --output_folder 's3://fh-pi-meshinchi-s/SR/starfusion/test' -with-report nextflow_report.html -work-dir 's3://fh-pi-meshinchi-s/SR/work' -cache TRUE -resume</code></pre></dd>
       </dl>
 
       <dl class="row small">
@@ -189,16 +192,16 @@ table.DTCR_clonedTable.dataTable{position:absolute !important;background-color:r
 
         
           <dt class="col-sm-3">Script name</dt>
-          <dd class="col-sm-9"><samp>STAR_Fusion_test.nf</samp></dd>
+          <dd class="col-sm-9"><samp>STAR_Fusion.nf</samp></dd>
         
 
         
           <dt class="col-sm-3">Script ID</dt>
-          <dd class="col-sm-9"><code>65dac8375b299c9fe903f9c324bb52ea</code></dd>
+          <dd class="col-sm-9"><code>65b430a31c9963db0ad6e2d023ffdd7d</code></dd>
         
 
         <dt class="col-sm-3">Workflow session</dt>
-        <dd class="col-sm-9"><code>2c97ec51-5715-4494-b913-876409d09c36</code></dd>
+        <dd class="col-sm-9"><code>48902aa9-ffed-420f-a023-7ce9ed1ab1fc</code></dd>
 
         
 
@@ -1020,7 +1023,7 @@ $(function() {
 
   // Nextflow report data
   window.data = { "trace":[
-{"task_id":"2","hash":"95\/ad16be","native_id":"6622f6e9-f0dd-4b4c-a5db-286389773ff0","process":"STAR_Fusion_test","module":"-","container":"trinityctat\/starfusion:1.8.1","tag":"-","name":"STAR_Fusion_test (2)","status":"COMPLETED","exit":"0","submit":"1573778968538","start":"1573781698222","complete":"1573781698366","duration":"2729828","realtime":"426","%cpu":"0.0","%mem":"0.0","rss":"3055616","vmem":"18812928","peak_rss":"3055616","peak_vmem":"18841600","rchar":"58083","wchar":"2000","syscr":"142","syscw":"13","read_bytes":"4096","write_bytes":"0","attempt":"1","workdir":"s3:\/\/fh-pi-meshinchi-s\/SR\/work\/95\/ad16be3beefe2c42db461fcb7962c7","script":"\n\tset -eou pipefail\n\tls -alh ctat_genome_lib_build_dir\n\tfind . -name \"AnnotFilterRule.pm\"\n\t","scratch":"-","queue":"optimal","cpus":"4","memory":"32212254720","disk":"-","time":"-","env":"-","error_action":"-","vol_ctxt":"1","inv_ctxt":"1"},{"task_id":"1","hash":"52\/9e746f","native_id":"0c48f588-3185-43a2-8f4e-7bc52eabb06a","process":"STAR_Fusion_test","module":"-","container":"trinityctat\/starfusion:1.8.1","tag":"-","name":"STAR_Fusion_test (1)","status":"COMPLETED","exit":"0","submit":"1573778968553","start":"1573781698591","complete":"1573781698612","duration":"2730059","realtime":"577","%cpu":"0.0","%mem":"0.0","rss":"3076096","vmem":"18812928","peak_rss":"3076096","peak_vmem":"18841600","rchar":"58083","wchar":"2000","syscr":"142","syscw":"13","read_bytes":"4096","write_bytes":"0","attempt":"1","workdir":"s3:\/\/fh-pi-meshinchi-s\/SR\/work\/52\/9e746f19f56d3f44c3c8ffc6313118","script":"\n\tset -eou pipefail\n\tls -alh ctat_genome_lib_build_dir\n\tfind . -name \"AnnotFilterRule.pm\"\n\t","scratch":"-","queue":"optimal","cpus":"4","memory":"32212254720","disk":"-","time":"-","env":"-","error_action":"-","vol_ctxt":"1","inv_ctxt":"1"}], "summary":[{"cpuUsage":null,"process":"STAR_Fusion_test","mem":{"mean":3065856,"min":3055616,"q1":3060736,"q2":3065856,"q3":3070976,"max":3076096,"minLabel":"STAR_Fusion_test (2)","maxLabel":"STAR_Fusion_test (1)","q1Label":"STAR_Fusion_test (2)","q2Label":"STAR_Fusion_test (2)","q3Label":"STAR_Fusion_test (2)"},"memUsage":{"mean":0.01,"min":0.01,"q1":0.01,"q2":0.01,"q3":0.01,"max":0.01,"minLabel":"STAR_Fusion_test (2)","maxLabel":"STAR_Fusion_test (1)","q1Label":"STAR_Fusion_test (2)","q2Label":"STAR_Fusion_test (2)","q3Label":"STAR_Fusion_test (2)"},"timeUsage":null,"vmem":{"mean":18841600,"min":18841600,"q1":18841600,"q2":18841600,"q3":18841600,"max":18841600,"minLabel":"STAR_Fusion_test (2)","maxLabel":"STAR_Fusion_test (1)","q1Label":"STAR_Fusion_test (2)","q2Label":"STAR_Fusion_test (2)","q3Label":"STAR_Fusion_test (2)"},"reads":{"mean":58083,"min":58083,"q1":58083,"q2":58083,"q3":58083,"max":58083,"minLabel":"STAR_Fusion_test (2)","maxLabel":"STAR_Fusion_test (1)","q1Label":"STAR_Fusion_test (2)","q2Label":"STAR_Fusion_test (2)","q3Label":"STAR_Fusion_test (2)"},"cpu":null,"time":{"mean":501.5,"min":426,"q1":463.75,"q2":501.5,"q3":539.25,"max":577,"minLabel":"STAR_Fusion_test (2)","maxLabel":"STAR_Fusion_test (1)","q1Label":"STAR_Fusion_test (2)","q2Label":"STAR_Fusion_test (2)","q3Label":"STAR_Fusion_test (2)"},"writes":{"mean":2000,"min":2000,"q1":2000,"q2":2000,"q3":2000,"max":2000,"minLabel":"STAR_Fusion_test (2)","maxLabel":"STAR_Fusion_test (1)","q1Label":"STAR_Fusion_test (2)","q2Label":"STAR_Fusion_test (2)","q3Label":"STAR_Fusion_test (2)"}}] };
+{"task_id":"1","hash":"88\/b1f492","native_id":"9b9d06e5-80d8-41cc-a924-918f40081d3a","process":"STAR_Fusion","module":"-","container":"trinityctat\/starfusion:latest","tag":"-","name":"STAR_Fusion (1)","status":"FAILED","exit":"-","submit":"1576890402838","start":"0","complete":"-","duration":"-","realtime":"-","%cpu":"-","%mem":"-","rss":"-","vmem":"-","peak_rss":"-","peak_vmem":"-","rchar":"-","wchar":"-","syscr":"-","syscw":"-","read_bytes":"-","write_bytes":"-","attempt":"1","workdir":"s3:\/\/fh-pi-meshinchi-s\/SR\/work\/88\/b1f492e9406dc6bdc9683b4f15884f","script":"\n\tset -eou pipefail\n\techo $PWD\/ctat_genome_lib_build_dir\n\n\t\/usr\/local\/src\/STAR-2.7.2b\/bin\/Linux_x86_64\/STAR --runMode alignReads \t\t--runThreadN 8 \t\t--genomeDir $PWD\/ctat_genome_lib_build_dir  \t\t--readFilesIn PANISJ-09A-01R_withJunctionsOnGenome_dupsFlagged_r1.fq.gz PANISJ-09A-01R_withJunctionsOnGenome_dupsFlagged_r2.fq.gz \t\t--readFilesCommand zcat \t\t--outReadsUnmapped None \t\t--outSAMunmapped Within  \t\t--twopassMode Basic \t\t--twopass1readsN -1 \t\t--outFileNamePrefix \"PANISJ-09A-01R_withJunctionsOnGenome_dupsFlagged_r1\" \t\t--outSAMtype BAM SortedByCoordinate \t\t--limitBAMsortRAM 63004036730 \t\t--outSAMattributes NH HI NM MD AS nM jM jI XS \t\t--chimSegmentMin 12 \t\t--chimJunctionOverhangMin 12 \t\t--chimOutJunctionFormat 1 \t\t--alignSJDBoverhangMin 10 \t\t--alignMatesGapMax 100000 \t\t--alignIntronMax 100000 \t\t--alignSJstitchMismatchNmax 5 -1 5 5 \t\t--outSAMattrRGline ID:GRPundef \t\t--chimMultimapScoreRange 3 \t\t--chimScoreJunctionNonGTAG -4 \t\t--chimMultimapNmax 20 \t  --chimNonchimScoreDropMin 10 \t\t--peOverlapNbasesMin 12 \t\t--peOverlapMMp 0.1 \t\t--chimFilter banGenomicN\n\n\n\t\/usr\/local\/src\/STAR-Fusion\/STAR-Fusion \t\t--genome_lib_dir $PWD\/ctat_genome_lib_build_dir  \t\t-J Chimeric.out.junction\n\t\t--CPU 8 \t\t--FusionInspector inspect \t\t--examine_coding_effect \t\t--denovo_reconstruct \t\t--output_dir \"PANISJ-09A-01R_withJunctionsOnGenome_dupsFlagged_r1\"\n\n\t","scratch":"-","queue":"optimal","cpus":"8","memory":"68719476736","disk":"-","time":"-","env":"-","error_action":"-","vol_ctxt":"-","inv_ctxt":"-"}], "summary":[{"cpuUsage":null,"process":"STAR_Fusion","mem":null,"memUsage":null,"timeUsage":null,"vmem":null,"reads":null,"cpu":null,"time":null,"writes":null}] };
 
   </script>
 
