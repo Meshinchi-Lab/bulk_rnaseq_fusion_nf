@@ -6,4 +6,6 @@
   1. Sample sheet, tab delimited
   2. The location of the CTAT resource library
 
-STAR-Fusion is then run on
+The output of STAR aligner, STAR-Fusion, and Fusion-Inspector will be uploaded to an S3 bucket. This includes the most relevant output files, such as SJ.out.tab, aligned.bam, and chimeric.junctions.tab, and the fusion inspector HTML report. 
+
+The output files will be put into a directory that is named after the sample ID provided in the sample sheet file.  
