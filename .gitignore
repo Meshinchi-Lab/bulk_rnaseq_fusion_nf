@@ -43,6 +43,7 @@ Thumbs.db
 .nextflow/
 .nextflow.*
 .command*
+nextflow_report*
 
 # temporary directories #
 **/tmp/

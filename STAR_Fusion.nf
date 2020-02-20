@@ -4,11 +4,13 @@
 // sample_sheet is tab separated with column names "Sample","R1","R2"
 fqs_ch = Channel.fromPath(file(params.sample_sheet))
 						.splitCsv(header: true, sep: '\t')
-						.map { sample -> [sample["Sample"], file(sample["R1"]), file(sample["R2"])]}
+						.map { sample -> [sample["Sample"] + "_", file(sample["R1"]), file(sample["R2"])]}
 genome_lib = params.genome_lib
+
 
 // define the output directory .
 params.output_folder = "./starfusion/"
+
 
 //Run star-fusion on all fastq pairs and save output with the sample ID
 process STAR_Fusion {
@@ -16,7 +18,7 @@ process STAR_Fusion {
 	publishDir "$params.output_folder/"
 
 	// use TrinityCTAT repo on docker hub.
-	container "trinityctat/starfusion:latest"
+	container "trinityctat/starfusion:1.8.1"
 	cpus 8
 	memory "64 GB"
 
@@ -30,57 +32,66 @@ process STAR_Fusion {
 
 	//define output files to save to the output_folder by publishDir command
 	output:
-	file "*Log.final.out"
-	file "*Log.out"
-	file "*Aligned.out.bam"
+	file "*Aligned.sortedByCoord.out.bam"
 	file "*SJ.out.tab"
+	file "*Log.final.out"
 	file "*Chimeric.out.junction"
-	file "*ReadsPerGene.out.tab"
-	file "*.abridged.coding_effect.tsv"
-	path "*FusionInspector*" maxDepth 1
+	file "${Sample}/*abridged.coding_effect.tsv"
+	path "${Sample}/FusionInspector-inspect" optional true
 
 	"""
 	set -eou pipefail
-	echo \$PWD/$genome_lib
 
-	/usr/local/src/STAR-2.7.2b/bin/Linux_x86_64/STAR --runMode alignReads \
-		--runThreadN 8 \
-		--genomeDir \$PWD/$genome_lib  \
-		--readFilesIn $R1 $R2 \
-		--readFilesCommand zcat \
-		--outReadsUnmapped None \
-		--outSAMunmapped Within  \
-		--twopassMode Basic \
-		--twopass1readsN -1 \
-		--outFileNamePrefix "${R1.simpleName}" \
-		--outSAMtype BAM SortedByCoordinate \
-		--limitBAMsortRAM 63004036730 \
-		--outSAMattributes NH HI NM MD AS nM jM jI XS \
-		--chimSegmentMin 12 \
-		--chimJunctionOverhangMin 12 \
-		--chimOutJunctionFormat 1 \
-		--alignSJDBoverhangMin 10 \
-		--alignMatesGapMax 100000 \
-		--alignIntronMax 100000 \
-		--alignSJstitchMismatchNmax 5 -1 5 5 \
-		--outSAMattrRGline ID:GRPundef \
-		--chimMultimapScoreRange 3 \
-		--chimScoreJunctionNonGTAG -4 \
-		--chimMultimapNmax 20 \
-	  --chimNonchimScoreDropMin 10 \
-		--peOverlapNbasesMin 12 \
-		--peOverlapMMp 0.1 \
-		--chimFilter banGenomicN
+	STAR --genomeDir \$PWD/$genome_lib/ref_genome.fa.star.idx \
+			--runThreadN 8 \
+			--readFilesIn $R1 $R2 \
+			--outFileNamePrefix $Sample \
+			--outReadsUnmapped None \
+			--twopassMode Basic \
+			--twopass1readsN -1 \
+			--readFilesCommand "gunzip -c" \
+			--outSAMunmapped Within \
+			--outSAMtype BAM SortedByCoordinate \
+			--limitBAMsortRAM 63004036730 \
+			--outSAMattributes NH HI NM MD AS nM jM jI XS \
+			--chimSegmentMin 12 \
+			--chimJunctionOverhangMin 12 \
+			--chimOutJunctionFormat 1 \
+			--alignSJDBoverhangMin 10 \
+			--alignMatesGapMax 100000 \
+			--alignIntronMax 100000 \
+			--alignSJstitchMismatchNmax 5 -1 5 5 \
+			--outSAMattrRGline ID:GRPundef \
+			--chimMultimapScoreRange 3 \
+			--chimScoreJunctionNonGTAG -4 \
+		  --chimMultimapNmax 20 \
+			--chimNonchimScoreDropMin 10 \
+			--peOverlapNbasesMin 12 \
+			--peOverlapMMp 0.1 \
+			--chimFilter banGenomicN
 
 
-	/usr/local/src/STAR-Fusion/STAR-Fusion \
-		--genome_lib_dir \$PWD/$genome_lib  \
-		-J Chimeric.out.junction
-		--CPU 8 \
-		--FusionInspector inspect \
-		--examine_coding_effect \
-		--denovo_reconstruct \
-		--output_dir "${R1.simpleName}"
+	/usr/local/src/STAR-Fusion/STAR-Fusion --genome_lib_dir \$PWD/$genome_lib \
+	  	--chimeric_junction "${Sample}Chimeric.out.junction" \
+			--left_fq $R1 \
+			--right_fq $R2 \
+	  	--CPU 8 \
+	  	--FusionInspector inspect \
+	  	--examine_coding_effect \
+	  	--denovo_reconstruct \
+	  	--output_dir $Sample
+
+	#make dummy output directory+files, since samples that have no fusion calls will not make an output directory from Fusion Inspector
+	#mkdir -p ${Sample}/FusionInspector-inspect
+	#touch ${Sample}/FusionInspector-inspect/file{1..3}.txt
+
+	echo ----------------------------------------
+	echo "list all output files in $PWD"
+	ls -1 \$PWD
+
+	echo -----------------------------------------
+	echo "list all output files in sample directory"
+	ls -1 $Sample
 
 	"""
 }
