@@ -19,7 +19,7 @@ First, create a sample manifest for the fastq files that are hosted in an S3 buc
 I have created a sample manifest file that can be used to select the appropriate files, with a demonstration in `Nextflow_AWS_Sample_Sheets_from_Manifest.ipynb` that uses the associated `create_sample_sheet.py`. Below is a very simple example directly on the command line.
 
 ```
-python3 create_sample_sheet.py "fh-pi-meshinchi-s" "fastq" "SR/picard_fq2/"
+python3 create_sample_sheet.py "fh-pi-meshinchi-s" "fastq" --prefix "SR/picard_fq2/"
 ```
 
 ## Second Step
