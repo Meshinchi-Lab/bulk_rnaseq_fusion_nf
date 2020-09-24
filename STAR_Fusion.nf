@@ -19,8 +19,8 @@ process STAR_Fusion {
 
 	// use TrinityCTAT repo on docker hub.
 	container "trinityctat/starfusion:1.8.1"
-	cpus 8
-	memory "64 GB"
+	cpus 16
+	memory "126 GB"
 
 	// if process fails, retry running it
 	errorStrategy "retry"

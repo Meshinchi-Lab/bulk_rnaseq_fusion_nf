@@ -16,4 +16,5 @@ nextflow run -c ~/nextflow.config STAR_Fusion.nf \
     -with-report STAR-Fusion_NUP98-NAPEPLD_report.html \
     -work-dir $BASE_BUCKET/work \
     -cache  TRUE \
+    -process.queue cpu-spot-50 \ #temporary bc spot-30 is not really working
     -resume

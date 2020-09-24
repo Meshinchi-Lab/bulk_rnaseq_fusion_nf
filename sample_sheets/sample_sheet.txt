@@ -1,2 +1,0 @@
-Sample	R1	R2
-PANISJ-09A-01R	s3://fh-pi-meshinchi-s/SR/picard_fq2/PANISJ-09A-01R_withJunctionsOnGenome_dupsFlagged_r1.fq.gz	s3://fh-pi-meshinchi-s/SR/picard_fq2/PANISJ-09A-01R_withJunctionsOnGenome_dupsFlagged_r2.fq.gz
