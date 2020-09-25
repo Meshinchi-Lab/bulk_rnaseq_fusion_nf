@@ -81,9 +81,6 @@ process STAR_Fusion {
 	  	--denovo_reconstruct \
 	  	--output_dir $Sample
 
-	#make dummy output directory+files, since samples that have no fusion calls will not make an output directory from Fusion Inspector
-	#mkdir -p ${Sample}/FusionInspector-inspect
-	#touch ${Sample}/FusionInspector-inspect/file{1..3}.txt
 
 	echo ----------------------------------------
 	echo "list all output files in $PWD"
