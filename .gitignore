@@ -1,3 +1,9 @@
+#Python notebooks
+__pycache__/
+*/.ipynb_checkpoints/
+*.pyc
+
+
 # Compiled source #
 ###################
 *.com
@@ -50,4 +56,3 @@ nextflow.config
 **/tmp/
 **/temp/
 /data/
-.ipynb_checkpoints/

@@ -6,7 +6,6 @@
 
 
 #import modules 
-import argparse
 import os
 import re
 import itertools
@@ -17,58 +16,94 @@ import numpy as np
 import pandas as pd
 
 
-def create_sample_sheet(bucket_name,prefix_name,filetype="fastq",samples=None,filename="sample_sheet.txt", write=True):
+def create_sample_sheet(bucket_name,prefix_name,filetype="fastq",samples="",filename="sample_sheet.txt", write=True):
 
     """
     A function to query an S3 bucket, list its objects, and filter the files by sample IDs. 
-    The bucket_name is a string. Example: "fh-pi-my-bucket"
-    The prefix_name is a string. Need trailing slash. Example: "SR/myfiles/"
+    
+    bucket_name: is a string. Example: "fh-pi-my-bucket"
+    prefix_name: is a string. Need trailing slash. Example: "SR/myfiles/"
+    filetype: is a srtring. One of "fastq" or "bam"
     """
 
     #function to parse the object summary from Boto3 for fastqs
-    def sample_name(s3_object_summary):
-        sample = s3_object_summary.key.split("/")[2]
-        sample = re.sub(r"[._][Rr][12].+$","", sample)
+    def sample_name(s3_object_summary,file_type):
+        path = s3_object_summary.key.split("/")
+        if file_type is "fastq":
+            pattern = re.compile("[._][Rr][12].+$")
+            
+            #sample = re.sub(r"[._][Rr][12].+$","", sample)
+        elif file_type is "bam":
+            pattern = re.compile(".bam$")
+        
+        file = ''.join(filter(pattern.search, path))
+        sample = re.sub(pattern, "", file)
         return(sample)
+    
     
     #Connection to S3 Bucket 
     s3 = boto3.resource('s3')
     bucket = s3.Bucket(bucket_name)
-    delim = "/"    
-
-    #query S3 bucket to list the fastq files 
-    fqs = bucket.objects.filter(Delimiter=delim,
-                                Prefix=prefix_name)
-
-    #iterate over the fastqs 
-    fqs_PE = dict()
-    for obj in fqs:
-        samp = sample_name(obj)
-#         print(samp)
-        if re.search(r"[._-][Rr][12].(fastq|fq)", obj.key):
-            read = '{0}//{1}/{2}'.format("s3:", obj.bucket_name, obj.key)
-
-            #print(samp + ":" + read)
-            if samp not in fqs_PE.keys():
-                fqs_PE[samp] = [read]
-            else:
-                fqs_PE[samp] = fqs_PE[samp] + [read]
-                #final sort to ensure order
-                fqs_PE[samp].sort()
-
-
-    print("There are " + str(len(fqs_PE)) + " Fastq files.")
-
-    #Create a pandas dataframe 
-    #split the samples for filtering by space or comma
-    #if no sample IDs are provided, the regex will include all files in the S3 bucket/prefix. 
-    if samples is None:
-        samples = ""
-
-    regex = re.compile('|'.join(re.split(',| ',samples)))
-    filtered = [{"Sample":sample,"R1":fastqs[0],"R2":fastqs[1]} for sample, fastqs in fqs_PE.items() if re.search(regex, sample)]
-    sample_sheet = pd.DataFrame(filtered) 
+    delim = "/"
     
+    
+    #query S3 bucket to list the all files the specified prefix
+    objects = bucket.objects.filter(Delimiter=delim,
+                                    Prefix=prefix_name)
+    
+  
+    #Prepare regex for filtering the objects in the prefix. 
+    #if no sample IDs are provided, the regex will include all files in the S3 bucket/prefix. 
+    assert type(samples) is str, "samples parameter must be a string type."
+    regex = re.compile('|'.join(re.split(',| ',samples)))
+    
+    #Iterate over the objects in the bucket/prefix
+    if filetype is "fastq":
+        #iterate over the fastqs 
+        fqs_PE = dict()
+        for obj in objects:
+            samp = sample_name(s3_object_summary=obj,
+                               file_type=filetype)
+            #print(samp)
+            if re.search(r"[._-][Rr][12].(fastq|fq)", obj.key):
+                read = '{0}//{1}/{2}'.format("s3:", obj.bucket_name, obj.key)
+
+                #print(samp + ":" + read)
+                if samp not in fqs_PE.keys():
+                    fqs_PE[samp] = [read]
+                else:
+                    fqs_PE[samp] = fqs_PE[samp] + [read]
+                    #final sort to ensure order
+                    fqs_PE[samp].sort()
+            #print("There are " + str(len(fqs_PE)) + " Fastq files.")
+        filtered = [{"Sample":sample,"R1":fastqs[0],"R2":fastqs[1]} for sample, fastqs in fqs_PE.items() if re.search(regex, sample)]
+        
+    if filetype is "bam":
+        #iterate over the bams 
+        bams = dict()
+        for obj in objects:
+            samp = sample_name(s3_object_summary=obj,
+                               file_type=filetype)
+            #print(samp)
+            if re.search(r".bam$", obj.key):
+                bam = '{0}//{1}/{2}'.format("s3:", obj.bucket_name, obj.key)
+
+#                 print(samp + " : " + bam)
+                if samp not in bams.keys():
+                    bams[samp] = bam
+                elif samp in bams.keys():
+                    print("The sample", samp,"has more than 1 BAM file." +
+                          "It was not included in the output." +
+                          "\nThe bam files are:", bams[samp], bam)
+        
+        #Filter the bams dictionary for samples to include
+        filtered = [{"Sample":sample,"BAM":bam} for sample, bam in bams.items() if re.search(regex, sample)]
+
+
+    #Convert into dictionary into a pandas dataframe
+    print("There are " + str(len(filtered)) + " " + 
+          filetype + " files.")
+    sample_sheet = pd.DataFrame(filtered) 
     
     #Save the dataframe to file or return the dataframe
     if write: 
