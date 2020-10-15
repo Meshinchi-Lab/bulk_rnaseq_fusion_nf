@@ -32,7 +32,7 @@ note: I have access to an HPC with specific software modules that can be loaded.
 ./STAR_Fusion_run.sh
 ```
 
-# CICERO Fusion
+# CICERO Fusion NF
 
 This repo also provides NF workflow for the [CICERO](https://github.com/stjude/CICERO) fusion detection algorithm. The image was build from the Dockerfile provided on the CICERO github without modification for v.0.3.0 and v.0.2.0.  
 
