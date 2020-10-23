@@ -22,7 +22,7 @@ def create_sample_sheet(bucket_name,prefix_name,filetype="fastq",samples="",file
     A function to query an S3 bucket, list its objects, and filter the files by sample IDs. 
     
     bucket_name: is a string. Example: "fh-pi-my-bucket"
-    prefix_name: is a string. Need trailing slash. Example: "SR/myfiles/"
+    prefix_name: is a string. Need trailing slash. Example: "SR/mydata/"
     filetype: is a srtring. One of "fastq" or "bam"
     """
 
