@@ -9,9 +9,9 @@ ml nextflow/20.04.0-edge
 
 
 #Execute the next flow workflow
-nextflow run -c ~/nextflow.config STAR_Fusion.nf \
+nextflow run -c ~/nextflow.config STAR_Fusion_Genome_Lib.nf \
     --inputs  Canis_lupus_familiaris_genome_refs.txt \
     --output_folder  $BASE_BUCKET/Reference_Data/CanFam3.1_Ensembl_v103_CTAT_lib/ \
-    -with-report STARFusion_Genome_Build_CanisFamiliaris_report.html \
+    -with-report STAR-Fusion_Genome_Build_CanisFamiliaris_report.html \
     -cache  TRUE \
     -resume
