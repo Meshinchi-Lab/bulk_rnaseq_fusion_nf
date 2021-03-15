@@ -10,6 +10,8 @@ The output of STAR aligner, STAR-Fusion, and Fusion-Inspector will be uploaded t
 
 The output files will be put into a directory that is named after the sample ID provided in the sample sheet file.  
 
+The docker image can be updated easily by selecting the latest image from the CTAT (docker hub)[https://hub.docker.com/r/trinityctat/starfusion]. Then update the `STAR_Fusion.nf` with the appropriate image and tag, such as `container "trinityctat/starfusion:1.10.0"`. 
+
 # To Run
 
 ## First Step:
