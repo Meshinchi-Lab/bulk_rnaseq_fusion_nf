@@ -39,7 +39,7 @@ process build_genome_refs {
 
 	\$STAR_FUSION_HOME/ctat-genome-lib-builder/prep_genome_lib.pl \
 	                       --genome_fa $GENOME \
-	                       --gtf $GTF \
+												 --gtf $GTF \
 												 --dfam_db $DFAM \
 	                       --pfam_db $PFAM \
 	                       --output_dir \$PWD \
