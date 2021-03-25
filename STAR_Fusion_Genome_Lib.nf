@@ -5,7 +5,7 @@
 //the file must include full file paths (bucket and prefix) of thier location on S3.
 inputs_ch = Channel.fromPath(file(params.inputs))
 						.splitCsv(header: true, sep: '\t')
-						.map { refs -> [file(refs["GENOME"]), file(refs["GTF"]), file(refs["DFAM"]), file(refs["PFAM"])]}
+						.map { refs -> [file(refs["GENOME"]), file(refs["GTF"]), refs["DFAM"], refs["PFAM"] ]}
 
 
 // define the output directory .
@@ -27,7 +27,7 @@ process build_genome_refs {
 
 	// declare the input types and its variable names
 	input:
-	tuple file(GENOME), file(GTF), file(DFAM), file(PFAM) from inputs_ch
+	tuple file(GENOME), file(GTF), val(DFAM), val(PFAM) from inputs_ch
 
 	//define output files to save to the output_folder by publishDir command
 	output:
@@ -42,7 +42,7 @@ process build_genome_refs {
 	                       --gtf $GTF \
 												 --dfam_db $DFAM \
 	                       --pfam_db $PFAM \
-	                       --output_dir \$PWD
+	                       --output_dir \$PWD \
 	                       --CPU 16
 
 	"""
