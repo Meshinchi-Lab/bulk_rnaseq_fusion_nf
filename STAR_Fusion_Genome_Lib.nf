@@ -36,10 +36,11 @@ process build_genome_refs {
 	"""
 	set -eou pipefail
 	echo \$STAR_FUSION_HOME
+	ls -alh \$PWD
 
 	\$STAR_FUSION_HOME/ctat-genome-lib-builder/prep_genome_lib.pl \
-	                       --genome_fa $GENOME \
-												 --gtf $GTF \
+	                       --genome_fa \$PWD/$GENOME \
+												 --gtf \$PWD/$GTF \
 												 --dfam_db $DFAM \
 	                       --pfam_db $PFAM \
 	                       --output_dir \$PWD \
