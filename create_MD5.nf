@@ -37,12 +37,12 @@ process MD5sums {
 	ls -1 \$PWD
 
 	echo "Creating MD5sum checks"
-	hashes="\${Filename}.md5"
+	hashes=\$(echo $Filename)
+	hashes=\${hashes}.md5
 	md5sum $Filename > \$hashes
 
 
 	echo ----------------------------------------
-	echo "list all output files in $PWD"
 	ls -1 \$PWD
 
 	"""
