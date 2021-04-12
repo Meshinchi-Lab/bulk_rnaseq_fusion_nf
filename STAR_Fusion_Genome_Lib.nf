@@ -43,8 +43,9 @@ process build_genome_refs {
 												 --gtf \$PWD/$GTF \
 												 --dfam_db $DFAM \
 	                       --pfam_db $PFAM \
-	                       --output_dir \$PWD \
 	                       --CPU 16
+
+	find . -name "ctat_genome_lib_build_dir" -type d
 
 	"""
 }
