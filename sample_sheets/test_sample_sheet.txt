@@ -1,3 +1,0 @@
-Sample	Filename
-atest	s3://fh-pi-meshinchi-s-eco-public/header.txt
-
