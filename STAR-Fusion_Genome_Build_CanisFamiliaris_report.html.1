@@ -18,11 +18,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="Nextflow workflow report for run id [small_khorana]">
+  <meta name="description" content="Nextflow workflow report for run id [deadly_montalcini]">
   <meta name="author" content="Paolo Di Tommaso, Phil Ewels">
   <link rel="icon" type="image/png" href="https://www.nextflow.io/img/favicon.png" />
 
-  <title>[small_khorana] Nextflow Workflow Report</title>
+  <title>[deadly_montalcini] Nextflow Workflow Report</title>
 
   <style type="text/css">
   /*!
@@ -137,7 +137,7 @@ table.DTCR_clonedTable.dataTable{position:absolute !important;background-color:r
         <li class="nav-item"><a class="nav-link" href="#tasks">Tasks</a></li>
       </ul>
       <span class="navbar-text">
-        [small_khorana]
+        [deadly_montalcini]
       </span>
     </div>
   </nav>
@@ -146,17 +146,17 @@ table.DTCR_clonedTable.dataTable{position:absolute !important;background-color:r
     <div class="container">
 
       <h1 class="display-3">Nextflow workflow report</h1>
-      <h2 class="text-muted mb-4"><samp>[small_khorana]</samp> <em>(resumed run)</em></h2>
+      <h2 class="text-muted mb-4"><samp>[deadly_montalcini]</samp> <em>(resumed run)</em></h2>
 
       
           <div class="alert alert-danger mb-4">
               <h4>Workflow execution completed unsuccessfully!</h4>
-              <p>The exit status of the task that caused the workflow execution to fail was: <code>null</code>.</p>
+              <p>The exit status of the task that caused the workflow execution to fail was: <code>2</code>.</p>
               <p>The full error message was:</p>
               <pre>Error executing process > 'build_genome_refs (1)'
 
 Caused by:
-  Process `build_genome_refs (1)` terminated for an unknown reason -- Likely it has been terminated by the external system
+  Process `build_genome_refs (1)` terminated with an error exit status (2)
 
 Command executed:
 
@@ -164,28 +164,126 @@ Command executed:
   echo $STAR_FUSION_HOME
   ls -alh $PWD
   
-  $STAR_FUSION_HOME/ctat-genome-lib-builder/prep_genome_lib.pl 	                       	--genome_fa $PWD/Canis_lupus_familiaris.CanFam3.1.dna.toplevel.fa 			 	--gtf $PWD/Canis_lupus_familiaris.CanFam3.1.103.gtf 				--dfam_db mouse 	                       	--pfam_db current 	                       	--CPU 16
-  
-  find . -name "ctat_genome_lib_build_dir" -type d
+  $STAR_FUSION_HOME/ctat-genome-lib-builder/prep_genome_lib.pl 	                       --genome_fa $PWD/Canis_lupus_familiaris.CanFam3.1.dna.toplevel.fa 												 --gtf $PWD/Canis_lupus_familiaris.CanFam3.1.103.gtf 												 --dfam_db mouse 	                       --pfam_db current 	                       --output_dir $PWD 	                       --CPU 16
 
 Command exit status:
-  -
+  2
 
 Command output:
-  (empty)
+  /usr/local/src/STAR-Fusion
+  total 2.3G
+  drwx------ 1 root root  298 Apr  2 22:44 .
+  drwx--x--x 1 root root  202 Apr  2 22:44 ..
+  -rw-r--r-- 1 root root    0 Apr  2 22:44 .command.err
+  -rw-r--r-- 1 root root   27 Apr  2 22:44 .command.out
+  -rw-r--r-- 1 root root  13K Apr  2 22:43 .command.run
+  -rw-r--r-- 1 root root  433 Apr  2 22:43 .command.sh
+  -rw-r--r-- 1 root root    0 Apr  2 22:44 .command.trace
+  -rw-r--r-- 1 root root 488M Mar 15 21:20 Canis_lupus_familiaris.CanFam3.1.103.gtf
+  -rw-r--r-- 1 root root 2.3G Mar 15 21:23 Canis_lupus_familiaris.CanFam3.1.dna.toplevel.fa
+  Working...    done.
+  Pressed and indexed 19179 HMMs (19179 names and 19179 accessions).
+  Models pressed into binary file:   Pfam-A.hmm.h3m
+  SSI index for binary model file:   Pfam-A.hmm.h3i
+  Profiles (MSV part) pressed into:  Pfam-A.hmm.h3f
+  Profiles (remainder) pressed into: Pfam-A.hmm.h3p
+  
+  
+  Building a new DB, current time: 04/02/2021 22:46:02
+  New DB name:   /tmp/nxf.feZl8hQruA/ref_genome.fa
+  New DB title:  /tmp/nxf.feZl8hQruA/ref_genome.fa
+  Sequence type: Nucleotide
+  Keep MBits: T
+  Maximum file size: 1000000000B
+  Adding sequences from FASTA; added 3268 sequences in 33.0507 seconds.
+  Apr 02 22:46:40 ..... started STAR run
+  Apr 02 22:46:40 ... starting to generate Genome files
+  Apr 02 22:47:28 ..... processing annotations GTF
+  Apr 02 22:47:50 ... starting to sort Suffix Array. This may take a long time...
+  Apr 02 22:48:07 ... sorting Suffix Array chunks and saving them to disk...
+  Apr 02 22:56:05 ... loading chunks from disk, packing SA...
+  Apr 02 22:57:18 ... finished generating suffix array
+  Apr 02 22:57:18 ... generating Suffix Array index
+  Apr 02 23:00:45 ... completed Suffix Array index
+  Apr 02 23:00:45 ..... inserting junctions into the genome indices
+  Apr 02 23:03:44 ... writing Genome to disk ...
+  Apr 02 23:03:45 ... writing Suffix Array to disk ...
+  Apr 02 23:03:55 ... writing SAindex to disk
+  Apr 02 23:03:59 ..... finished successfully
+  
+  
+  Building a new DB, current time: 04/03/2021 02:00:39
+  New DB name:   /tmp/nxf.feZl8hQruA/ref_annot.cdsplus.dfam_masked.fa
+  New DB title:  ref_annot.cdsplus.dfam_masked.fa
+  Sequence type: Nucleotide
+  Keep MBits: T
+  Maximum file size: 1000000000B
+  Adding sequences from FASTA; added 60994 sequences in 2.23828 seconds.
+
+Command error:
+  Warning: Skipping ENSCAFG00000009901 (five_prime_utr) as this gene is already included as a coding gene.
+  Warning: Skipping ENSCAFG00000013058 (five_prime_utr) as this gene is already included as a coding gene.
+  Warning: Skipping ENSCAFG00000010595 (five_prime_utr) as this gene is already included as a coding gene.
+  Warning: Skipping ENSCAFG00000010767 (five_prime_utr) as this gene is already included as a coding gene.
+  Warning: Skipping ENSCAFG00000011731 (five_prime_utr) as this gene is already included as a coding gene.
+  Warning: Skipping ENSCAFG00000010046 (five_prime_utr) as this gene is already included as a coding gene.
+  Warning: Skipping ENSCAFG00000009459 (five_prime_utr) as this gene is already included as a coding gene.
+  Warning: Skipping ENSCAFG00000012666 (five_prime_utr) as this gene is already included as a coding gene.
+  Warning: Skipping ENSCAFG00000011706 (five_prime_utr) as this gene is already included as a coding gene.
+  Warning: Skipping ENSCAFG00000009669 (five_prime_utr) as this gene is already included as a coding gene.
+  Warning: Skipping ENSCAFG00000031101 (five_prime_utr) as this gene is already included as a coding gene.
+  Warning: Skipping ENSCAFG00000010839 (five_prime_utr) as this gene is already included as a coding gene.
+  Warning: Skipping ENSCAFG00000010180 (five_prime_utr) as this gene is already included as a coding gene.
+  Warning: Skipping ENSCAFG00000029844 (five_prime_utr) as this gene is already included as a coding gene.
+  Warning: Skipping ENSCAFG00000013015 (five_prime_utr) as this gene is already included as a coding gene.
+  Warning: Skipping ENSCAFG00000042553 (five_prime_utr) as this gene is already included as a coding gene.
+  Warning: Skipping ENSCAFG00000013086 (five_prime_utr) as this gene is already included as a coding gene.
+  Warning: Skipping ENSCAFG00000009468 (five_prime_utr) as this gene is already included as a coding gene.
+  Warning: Skipping ENSCAFG00000013223 (five_prime_utr) as this gene is already included as a coding gene.
+  Warning: Skipping ENSCAFG00000010624 (five_prime_utr) as this gene is already included as a coding gene.
+  Warning: Skipping ENSCAFG00000013472 (five_prime_utr) as this gene is already included as a coding gene.
+  Warning: Skipping ENSCAFG00000012689 (five_prime_utr) as this gene is already included as a coding gene.
+  Warning: Skipping ENSCAFG00000009564 (five_prime_utr) as this gene is already included as a coding gene.
+  Warning: Skipping ENSCAFG00000031149 (five_prime_utr) as this gene is already included as a coding gene.
+  Warning: Skipping ENSCAFG00000028933 (five_prime_utr) as this gene is already included as a coding gene.
+  Warning: Skipping ENSCAFG00000013353 (five_prime_utr) as this gene is already included as a coding gene.
+  Warning: Skipping ENSCAFG00000012921 (five_prime_utr) as this gene is already included as a coding gene.
+  Warning: Skipping ENSCAFG00000011807 (five_prime_utr) as this gene is already included as a coding gene.
+  Warning: Skipping ENSCAFG00000029969 (five_prime_utr) as this gene is already included as a coding gene.
+  Warning: Skipping ENSCAFG00000009628 (five_prime_utr) as this gene is already included as a coding gene.
+  Warning: Skipping ENSCAFG00000010137 (five_prime_utr) as this gene is already included as a coding gene.
+  Warning: Skipping ENSCAFG00000012579 (five_prime_utr) as this gene is already included as a coding gene.
+  Warning: Skipping ENSCAFG00000010927 (five_prime_utr) as this gene is already included as a coding gene.
+  Warning: Skipping ENSCAFG00000031934 (five_prime_utr) as this gene is already included as a coding gene.
+  Warning: Skipping ENSCAFG00000012716 (five_prime_utr) as this gene is already included as a coding gene.
+  Warning: Skipping ENSCAFG00000030137 (five_prime_utr) as this gene is already included as a coding gene.
+  Warning: Skipping ENSCAFG00000010842 (five_prime_utr) as this gene is already included as a coding gene.
+  Warning: Skipping ENSCAFG00000043714 (five_prime_utr) as this gene is already included as a coding gene.
+  Warning: Skipping ENSCAFG00000010290 (five_prime_utr) as this gene is already included as a coding gene.
+  Warning: Skipping ENSCAFG00000009450 (five_prime_utr) as this gene is already included as a coding gene.
+  Warning: Skipping ENSCAFG00000013491 (five_prime_utr) as this gene is already included as a coding gene.
+  Warning: Skipping ENSCAFG00000009649 (five_prime_utr) as this gene is already included as a coding gene.
+  Warning: Skipping ENSCAFG00000012544 (five_prime_utr) as this gene is already included as a coding gene.
+  Warning: Skipping ENSCAFG00000024030 (five_prime_utr) as this gene is already included as a coding gene.
+  Warning: Skipping ENSCAFG00000028861 (five_prime_utr) as this gene is already included as a coding gene.
+  Warning: Skipping ENSCAFG00000029624 (five_prime_utr) as this gene is already included as a coding gene.
+  * Running CMD: cp ref_annot.cdna.fa /tmp/nxf.feZl8hQruA/ref_annot.cdna.fa
+  cp: 'ref_annot.cdna.fa' and '/tmp/nxf.feZl8hQruA/ref_annot.cdna.fa' are the same file
+  Error, cmd: cp ref_annot.cdna.fa /tmp/nxf.feZl8hQruA/ref_annot.cdna.fa died with ret 256 No such file or directory at /usr/local/src/STAR-Fusion/ctat-genome-lib-builder/lib/Pipeliner.pm line 186.
+  	Pipeliner::run(Pipeliner=HASH(0x559bcc8aafb8)) called at /usr/local/src/STAR-Fusion/ctat-genome-lib-builder/prep_genome_lib.pl line 460
 
 Work dir:
-  s3://fh-pi-meshinchi-s-nextflow-scratch/04/e1c137f884b8e62334570106467b5b
+  s3://fh-pi-meshinchi-s-nextflow-scratch/35/8cac9327851a07089db63c2a764440
 
-Tip: when you have fixed the problem you can continue the execution adding the option `-resume` to the run command line</pre>
+Tip: view the complete command output by changing to the process work dir and entering the command `cat .command.out`</pre>
           </div>
       
 
       <dl>
         <dt>Run times</dt>
         <dd>
-          <span id="workflow_start">12-Apr-2021 11:59:49</span> - <span id="workflow_complete">12-Apr-2021 22:07:31</span>
-          (<span id="completed_fromnow"></span>duration: <strong>10h 7m 42s</strong>)
+          <span id="workflow_start">02-Apr-2021 12:17:33</span> - <span id="workflow_complete">02-Apr-2021 19:04:58</span>
+          (<span id="completed_fromnow"></span>duration: <strong>6h 47m 26s</strong>)
         </dd>
 
         <dl>
@@ -203,7 +301,7 @@ Tip: when you have fixed the problem you can continue the execution adding the o
 
       <dl class="row small">
         <dt class="col-sm-3">CPU-Hours</dt>
-        <dd class="col-sm-9"><samp>139.1 (100% failed)</samp></dd>
+        <dd class="col-sm-9"><samp>107.2 (100% failed)</samp></dd>
 
         <dt class="col-sm-3">Launch directory</dt>
         <dd class="col-sm-9"><samp>/home/jlsmith3/scripts/STAR-fusion-NF</samp></dd>
@@ -221,7 +319,7 @@ Tip: when you have fixed the problem you can continue the execution adding the o
 
         
           <dt class="col-sm-3">Script ID</dt>
-          <dd class="col-sm-9"><code>f29f90632ff0f5534dda79f0dea014a7</code></dd>
+          <dd class="col-sm-9"><code>40c337528406b4be7ea1b744141ebb34</code></dd>
         
 
         <dt class="col-sm-3">Workflow session</dt>
@@ -1047,7 +1145,7 @@ $(function() {
 
   // Nextflow report data
   window.data = { "trace":[
-{"task_id":"1","hash":"15\/234e8a","native_id":"9555427d-fe86-47a2-9e52-cdc8ed40f65a","process":"build_genome_refs","module":"-","container":"trinityctat\/starfusion:1.10.0","tag":"-","name":"build_genome_refs (1)","status":"FAILED","exit":"-","submit":"1618253992138","start":"1618254320542","complete":"1618275561080","duration":"21568942","realtime":"21240538","%cpu":"-","%mem":"-","rss":"-","vmem":"-","peak_rss":"-","peak_vmem":"-","rchar":"-","wchar":"-","syscr":"-","syscw":"-","read_bytes":"-","write_bytes":"-","attempt":"1","workdir":"s3:\/\/fh-pi-meshinchi-s-nextflow-scratch\/15\/234e8aaa596c189a2d9ea437c2ab4e","script":"\n\tset -eou pipefail\n\techo $STAR_FUSION_HOME\n\tls -alh $PWD\n\n\t$STAR_FUSION_HOME\/ctat-genome-lib-builder\/prep_genome_lib.pl \t                       \t--genome_fa $PWD\/Canis_lupus_familiaris.CanFam3.1.dna.toplevel.fa \t\t\t \t--gtf $PWD\/Canis_lupus_familiaris.CanFam3.1.103.gtf \t\t\t\t--dfam_db mouse \t                       \t--pfam_db current \t                       \t--CPU 16\n\n\tfind . -name \"ctat_genome_lib_build_dir\" -type d\n\n\t","scratch":"-","queue":"default","cpus":"16","memory":"135291469824","disk":"-","time":"-","env":"-","error_action":"RETRY","vol_ctxt":"-","inv_ctxt":"-"},{"task_id":"2","hash":"04\/e1c137","native_id":"9b126f71-24cd-4a83-8a14-f94a8740c59a","process":"build_genome_refs","module":"-","container":"trinityctat\/starfusion:1.10.0","tag":"-","name":"build_genome_refs (1)","status":"FAILED","exit":"-","submit":"1618275561684","start":"1618280390967","complete":"1618290451213","duration":"14889529","realtime":"10060246","%cpu":"-","%mem":"-","rss":"-","vmem":"-","peak_rss":"-","peak_vmem":"-","rchar":"-","wchar":"-","syscr":"-","syscw":"-","read_bytes":"-","write_bytes":"-","attempt":"2","workdir":"s3:\/\/fh-pi-meshinchi-s-nextflow-scratch\/04\/e1c137f884b8e62334570106467b5b","script":"\n\tset -eou pipefail\n\techo $STAR_FUSION_HOME\n\tls -alh $PWD\n\n\t$STAR_FUSION_HOME\/ctat-genome-lib-builder\/prep_genome_lib.pl \t                       \t--genome_fa $PWD\/Canis_lupus_familiaris.CanFam3.1.dna.toplevel.fa \t\t\t \t--gtf $PWD\/Canis_lupus_familiaris.CanFam3.1.103.gtf \t\t\t\t--dfam_db mouse \t                       \t--pfam_db current \t                       \t--CPU 16\n\n\tfind . -name \"ctat_genome_lib_build_dir\" -type d\n\n\t","scratch":"-","queue":"default","cpus":"16","memory":"135291469824","disk":"-","time":"-","env":"-","error_action":"TERMINATE","vol_ctxt":"-","inv_ctxt":"-"}], "summary":[{"cpuUsage":null,"process":"build_genome_refs","mem":null,"memUsage":null,"timeUsage":null,"vmem":null,"reads":null,"cpu":null,"time":{"mean":15650392,"min":10060246,"q1":12855319,"q2":15650392,"q3":18445465,"max":21240538,"minLabel":"build_genome_refs (1)","maxLabel":"build_genome_refs (1)","q1Label":"build_genome_refs (1)","q2Label":"build_genome_refs (1)","q3Label":"build_genome_refs (1)"},"writes":null}] };
+{"task_id":"1","hash":"fe\/a9672d","native_id":"0ce16d6c-4c12-4f66-913a-5f7ac043d72a","process":"build_genome_refs","module":"-","container":"trinityctat\/starfusion:1.10.0","tag":"-","name":"build_genome_refs (1)","status":"FAILED","exit":"2","submit":"1617391058250","start":"1617391364909","complete":"1617403435264","duration":"12377014","realtime":"12070355","%cpu":"-","%mem":"-","rss":"-","vmem":"-","peak_rss":"-","peak_vmem":"-","rchar":"-","wchar":"-","syscr":"-","syscw":"-","read_bytes":"-","write_bytes":"-","attempt":"1","workdir":"s3:\/\/fh-pi-meshinchi-s-nextflow-scratch\/fe\/a9672dcd1c92385205442eeaf259cc","script":"\n\tset -eou pipefail\n\techo $STAR_FUSION_HOME\n\tls -alh $PWD\n\n\t$STAR_FUSION_HOME\/ctat-genome-lib-builder\/prep_genome_lib.pl \t                       --genome_fa $PWD\/Canis_lupus_familiaris.CanFam3.1.dna.toplevel.fa \t\t\t\t\t\t\t\t\t\t\t\t --gtf $PWD\/Canis_lupus_familiaris.CanFam3.1.103.gtf \t\t\t\t\t\t\t\t\t\t\t\t --dfam_db mouse \t                       --pfam_db current \t                       --output_dir $PWD \t                       --CPU 16\n\n\t","scratch":"-","queue":"default","cpus":"16","memory":"135291469824","disk":"-","time":"-","env":"-","error_action":"RETRY","vol_ctxt":"-","inv_ctxt":"-"},{"task_id":"2","hash":"35\/8cac93","native_id":"bbdfdc80-93d8-4b8d-b623-1af2f557fcea","process":"build_genome_refs","module":"-","container":"trinityctat\/starfusion:1.10.0","tag":"-","name":"build_genome_refs (1)","status":"FAILED","exit":"2","submit":"1617403435575","start":"1617403445156","complete":"1617415495434","duration":"12059859","realtime":"12050278","%cpu":"-","%mem":"-","rss":"-","vmem":"-","peak_rss":"-","peak_vmem":"-","rchar":"-","wchar":"-","syscr":"-","syscw":"-","read_bytes":"-","write_bytes":"-","attempt":"2","workdir":"s3:\/\/fh-pi-meshinchi-s-nextflow-scratch\/35\/8cac9327851a07089db63c2a764440","script":"\n\tset -eou pipefail\n\techo $STAR_FUSION_HOME\n\tls -alh $PWD\n\n\t$STAR_FUSION_HOME\/ctat-genome-lib-builder\/prep_genome_lib.pl \t                       --genome_fa $PWD\/Canis_lupus_familiaris.CanFam3.1.dna.toplevel.fa \t\t\t\t\t\t\t\t\t\t\t\t --gtf $PWD\/Canis_lupus_familiaris.CanFam3.1.103.gtf \t\t\t\t\t\t\t\t\t\t\t\t --dfam_db mouse \t                       --pfam_db current \t                       --output_dir $PWD \t                       --CPU 16\n\n\t","scratch":"-","queue":"default","cpus":"16","memory":"135291469824","disk":"-","time":"-","env":"-","error_action":"TERMINATE","vol_ctxt":"-","inv_ctxt":"-"}], "summary":[{"cpuUsage":null,"process":"build_genome_refs","mem":null,"memUsage":null,"timeUsage":null,"vmem":null,"reads":null,"cpu":null,"time":{"mean":12060316.5,"min":12050278,"q1":12055297.25,"q2":12060316.5,"q3":12065335.75,"max":12070355,"minLabel":"build_genome_refs (1)","maxLabel":"build_genome_refs (1)","q1Label":"build_genome_refs (1)","q2Label":"build_genome_refs (1)","q3Label":"build_genome_refs (1)"},"writes":null}] };
 
   </script>
 
