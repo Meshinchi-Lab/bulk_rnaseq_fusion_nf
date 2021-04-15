@@ -1,10 +1,10 @@
 #!/usr/bin/env nextflow
 
-// Define the input paired fastq files in a sample sheet and genome references
-// sample_sheet is tab separated with column names "Sample","BAM"
+// Define the input BAM files, sorted and indexed, in a sample sheet and the genome references
+// sample_sheet is tab separated with column names "Sample","BAM", "INDEX"
 bam_ch = Channel.fromPath(file(params.sample_sheet))
 						.splitCsv(header: true, sep: '\t')
-						.map { inputs -> [inputs["Sample"], file(inputs["BAM"]) ]}
+						.map { inputs -> [inputs["Sample"], file(inputs["BAM"]), file(inputs["INDEX"])] }
 
 //Gene Model references
 gene_model = params.gene_model
@@ -29,7 +29,7 @@ process tin_scores {
 	// declare the input types and its variable names
 	input:
 	path gene_model
-	tuple val(Sample), file(BAM) from bam_ch
+	tuple val(Sample), file(BAM), file(INDEX) from bam_ch
 
 	//define output files to save to the output_folder by publishDir command
 	output:
@@ -40,7 +40,7 @@ process tin_scores {
 	ls -1 \$PWD
 
 	tin.py -i $BAM -r $gene_model
-	rm $BAM
+	rm $BAM #to avoid upload to workDir
 
 	echo ----------------------------------------
 	ls -1 \$PWD
