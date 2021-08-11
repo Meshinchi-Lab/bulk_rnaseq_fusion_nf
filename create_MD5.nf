@@ -11,7 +11,7 @@ input_ch = Channel.fromPath(file(params.sample_sheet))
 params.output_folder = "./MD5sums/"
 
 
-//Run star-fusion on all fastq pairs and save output with the sample ID
+//Create MD5sum checks for all files in the channel 
 process MD5sums {
 
 	publishDir "$params.output_folder/"
