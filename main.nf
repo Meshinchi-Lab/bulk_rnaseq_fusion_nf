@@ -29,12 +29,20 @@ workflow starfusion {
 								.splitCsv(header: true, sep: '\t')
 								.map { sample -> [sample["Sample"] + "_", file(sample["R1"]), file(sample["R2"])]}
 
+    //flattened channel for MD5sums to create 1 file per fastq
+    files_ch = Channel.fromPath(file(params.sample_sheet))
+                      .splitCsv(header: true, sep: '\t')
+                      .map { Filename -> [file(Filename["R1"]), file(Filename["R2"])]}
+                      .flatten()
+
 		//processes are treated like functions
 		STAR_Fusion(fqs_ch)
-		MD5sums(fqs_ch)
-		fastqc(fqs_ch)
+    MD5sums(files_ch)
 
+
+    //run QC on the fastq files
 		//direcly call a process on the output of a previous task
-		multiQC(fastqc.out.collect())
+    fastqc(fqs_ch)
+		multiqc(fastqc.out.collect())
 
 }

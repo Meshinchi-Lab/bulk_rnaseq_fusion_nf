@@ -1,11 +1,17 @@
 // Run fastQC to check each input fastq for quality metrics
 // from nextflow training April 2020 at Fred Hutch, Seattle WA
 process fastqc {
+
     //use image on quay.io
     container "quay.io/biocontainers/fastqc:0.11.9--hdfd78af_1"
+    cpus 4
+    memory "32 GB"
+
+    // if process fails, retry running it
+    errorStrategy "retry"
 
     input:
-    tuple val(Sample), path(reads)
+    tuple val(Sample), file(R1), file(R2)
 
     output:
     path "fastqc_${Sample}_logs"
@@ -13,18 +19,25 @@ process fastqc {
     script:
     """
     mkdir fastqc_${Sample}_logs
-    fastqc -o fastqc_${Sample}_logs -f fastq -q ${reads}
+    fastqc -o fastqc_${Sample}_logs -t 6 -f fastq -q $R1 $R2
     """
 }
 
 
 //Run multiQC to concatenate the results of the fastQC process
 // from nextflow training April 2020 at Fred Hutch, Seattle WA
+// mode:'copy'
 process multiqc {
-    publishDir params.multiqc, mode:'copy'
+
+    publishDir params.multiqc
 
     //use image on quay.io
     container "quay.io/lifebitai/multiqc:latest"
+    cpus 4
+    memory "32 GB"
+
+    // if process fails, retry running it
+    errorStrategy "retry"
 
     input:
     path '*'
@@ -46,8 +59,8 @@ process STAR_Fusion {
 
 	// use TrinityCTAT repo on docker hub.
 	container "trinityctat/starfusion:1.8.1"
-	cpus 16
-	memory "126 GB"
+	cpus 8
+	memory "64 GB"
 
 	// if process fails, retry running it
 	errorStrategy "retry"
@@ -66,6 +79,7 @@ process STAR_Fusion {
 	file "${Sample}/*abridged.coding_effect.tsv"
 	path "${Sample}/FusionInspector-inspect" optional true
 
+  script:
 	"""
 	set -eou pipefail
 
@@ -120,6 +134,7 @@ process STAR_Fusion {
 	"""
 }
 
+
 //build a CTAT resource library for STAR-Fusion use.
 process build_genome_refs {
 
@@ -141,6 +156,7 @@ process build_genome_refs {
 	output:
 	path "ctat_genome_lib_build_dir"
 
+  script:
 	"""
 	set -eou pipefail
 	echo \$STAR_FUSION_HOME
@@ -182,6 +198,7 @@ process CICERO {
 	output:
 	file "*"
 
+  script:
 	"""
 	set -eou pipefail
 
@@ -222,6 +239,7 @@ process tin_scores {
 	output:
 	file "*"
 
+  script:
 	"""
 	set -eou pipefail
 	ls -1 \$PWD
@@ -231,7 +249,6 @@ process tin_scores {
 
 	echo ----------------------------------------
 	ls -1 \$PWD
-
 	"""
 }
 
@@ -242,7 +259,7 @@ process MD5sums {
 
 	publishDir "$params.output_folder/"
 
-	// use TrinityCTAT repo on docker hub.
+	// use ubuntu repo on docker hub.
 	container "ubuntu:latest"
 	cpus 4
 	memory "16 GB"
@@ -252,24 +269,18 @@ process MD5sums {
 
 	// declare the input types and its variable names
 	input:
-	tuple val(Sample), file(Filename)
+	file Filename
 
 	//define output files to save to the output_folder by publishDir command
 	output:
 	file "*.md5"
 
+  script:
 	"""
 	set -eou pipefail
-	ls -1 \$PWD
 
 	echo "Creating MD5sum checks"
-	hashes=\$(echo $Filename)
-	hashes=\${hashes}.md5
-	md5sum $Filename > \$hashes
-
-
-	echo ----------------------------------------
-	ls -1 \$PWD
-
+  hashes=${Filename}.md5
+  md5sum $Filename > \$hashes
 	"""
 }
