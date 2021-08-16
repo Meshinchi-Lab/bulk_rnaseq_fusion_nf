@@ -29,7 +29,7 @@ process fastqc {
 // mode:'copy'
 process multiqc {
 
-    publishDir params.multiqc
+    publishDir params.multiQC
 
     //use image on quay.io
     container "quay.io/lifebitai/multiqc:latest"

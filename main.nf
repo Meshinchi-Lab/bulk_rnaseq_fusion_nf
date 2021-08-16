@@ -6,7 +6,7 @@ genome_lib = params.genome_lib
 
 // define the output directories.
 params.output_folder = "./starfusion/"
-params.multiqc = "./multiqc/"
+params.multiQC = "./multiqc/"
 
 
 //Define message for the process logs.
@@ -20,9 +20,9 @@ log.info """\
          .stripIndent()
 
 
-include { STAR_Fusion; MD5sums; fastqc; mutliqc } from './fusion-processes.nf'
+include { STAR_Fusion; MD5sums; fastqc; multiqc } from './fusion-processes.nf'
 
-workflow starfusion {
+workflow  {
 		// Define the input paired fastq files in a sample sheet and genome references.
 		//The sample_sheet is tab separated with column names "Sample","R1","R2"
 		fqs_ch = Channel.fromPath(file(params.sample_sheet))
@@ -36,7 +36,7 @@ workflow starfusion {
                       .flatten()
 
 		//processes are treated like functions
-		STAR_Fusion(fqs_ch)
+		STAR_Fusion(genome_lib,fqs_ch)
     MD5sums(files_ch)
 
 
