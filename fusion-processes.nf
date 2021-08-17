@@ -40,7 +40,7 @@ process multiqc {
     errorStrategy "retry"
 
     input:
-    path '*'
+    path "*"
 
     output:
     path 'multiqc_report.html'
@@ -178,7 +178,7 @@ process build_genome_refs {
 //Run CICERO fusion detection on all bam files and save output with the sample ID
 process CICERO {
 
-	publishDir "$params.output_folder/"
+	publishDir "$params.CICERO"
 
 	// use TrinityCTAT repo on docker hub.
 	container "jennylsmith/cicero:v0.3.0"
@@ -190,21 +190,20 @@ process CICERO {
 
 	// declare the input types and its variable names
 	input:
-	path genome_lib
+	path cicero_genome_lib
 	tuple val(Sample), file(BAM)
 
 	//define output files to save to the output_folder by publishDir command
-	//path "${Sample}/" optional true
 	output:
-	file "*"
+	path "${Sample}" optional true
 
   script:
 	"""
 	set -eou pipefail
 
 	Cicero.sh -n 8 -b $BAM -g "GRCh37-lite" \
-		-r \$PWD/$genome_lib/ \
-		-o $output_folder/$Sample
+		-r \$PWD/$cicero_genome_lib/ \
+		-o ${Sample}
 
 	echo ----------------------------------------
 	echo "list all output files in $PWD"
@@ -213,7 +212,6 @@ process CICERO {
 	echo -----------------------------------------
 	echo "list all output files in sample directory"
 	ls -1 $Sample
-
 	"""
 }
 
@@ -257,8 +255,6 @@ process tin_scores {
 //Create MD5sum checks for all files in the channel
 process MD5sums {
 
-	publishDir "$params.output_folder/"
-
 	// use ubuntu repo on docker hub.
 	container "ubuntu:latest"
 	cpus 4
@@ -280,7 +276,9 @@ process MD5sums {
 	set -eou pipefail
 
 	echo "Creating MD5sum checks"
+
   hashes=${Filename}.md5
   md5sum $Filename > \$hashes
+
 	"""
 }
