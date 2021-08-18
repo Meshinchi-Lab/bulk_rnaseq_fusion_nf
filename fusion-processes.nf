@@ -204,11 +204,6 @@ process CICERO {
   #index the bam file
   samtools index $BAM
 
-  #check that the bam file exists and is indexed
-  echo "The bam file input is: " $BAM
-  ls -1
-
-
   #run CICERO fusion detection algorithm
 	Cicero.sh -n 8 -b \$PWD/$BAM -g "GRCh37-lite" \
 		-r \$PWD/$cicero_genome_lib/ \
@@ -227,7 +222,7 @@ process CICERO {
 //Run tin.py for QC check on all BAM files and save output with the sample ID
 process tin_scores {
 
-	publishDir "$params.output_folder/"
+	publishDir "$params.R/"
 
 	// use Bioconainers repo on quay.io.
 	container "quay.io/biocontainers/rseqc:4.0.0--py39h38f01e4_1"
