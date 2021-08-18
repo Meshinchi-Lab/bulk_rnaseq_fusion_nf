@@ -22,11 +22,12 @@ log.info """\
 include { STAR_Fusion; MD5sums; fastqc; multiqc; CICERO } from './fusion-processes.nf'
 
 workflow  {
+    /*
 		// Define the input paired fastq files in a sample sheet and genome references.
 		//The sample_sheet is tab separated with column names "Sample","R1","R2"
 		fqs_ch = Channel.fromPath(file(params.sample_sheet))
-								.splitCsv(header: true, sep: '\t')
-								.map { sample -> [sample["Sample"] + "_", file(sample["R1"]), file(sample["R2"])]}
+				.splitCsv(header: true, sep: '\t')
+				.map { sample -> [sample["Sample"] + "_", file(sample["R1"]), file(sample["R2"])]}
 
     //flattened channel for MD5sums to create 1 file per fastq
     files_ch = Channel.fromPath(file(params.sample_sheet))
@@ -35,14 +36,15 @@ workflow  {
                       .flatten()
 
 		//processes are treated like functions
-		STAR_Fusion(params.star_genome_lib, fqs_ch)
+    STAR_Fusion(params.star_genome_lib, fqs_ch)
     MD5sums(files_ch)
 
 
     //run QC on the fastq files
-		//direcly call a process on the output of a previous task
+    //direcly call a process on the output of a previous task
     fastqc(fqs_ch)
-		multiqc(fastqc.out.collect())
+    multiqc(fastqc.out.collect())
+    */
 
 
     //Create new channel for the BAM output of STAR fusion

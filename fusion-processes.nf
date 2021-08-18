@@ -180,8 +180,8 @@ process CICERO {
 
 	publishDir "$params.CICERO"
 
-	// use TrinityCTAT repo on docker hub.
-	container "jennylsmith/cicero:v0.3.0"
+	// use CICERO repo on docker hub.
+	container "jennylsmith/cicero:v1.7.1"
 	cpus 8
 	memory "64 GB"
 
@@ -201,6 +201,10 @@ process CICERO {
 	"""
 	set -eou pipefail
 
+  #index the bam file
+  samtools index $BAM
+
+  #run CICERO fusion detection algorithm
 	Cicero.sh -n 8 -b $BAM -g "GRCh37-lite" \
 		-r \$PWD/$cicero_genome_lib/ \
 		-o ${Sample}
