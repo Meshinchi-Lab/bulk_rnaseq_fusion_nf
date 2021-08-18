@@ -70,4 +70,7 @@ Docker Image: https://hub.docker.com/repository/docker/jennylsmith/cicero
 
 This CICERO step is currently included in  `main.nf` workflow, in addition to running [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) and [multiQC](https://multiqc.info/) on the input fastq files. 
 
+# DSL2 Resources
 
+* [Tutorial](https://github.com/nextflow-io/nfcamp-tutorial)
+* [Documentation](https://www.nextflow.io/docs/latest/dsl2.html)
