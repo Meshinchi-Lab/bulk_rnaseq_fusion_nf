@@ -5,16 +5,17 @@
  This workflow requires:
   1. Sample sheet, tab delimited
   2. The location of the CTAT resource library
+  3. The location of CICERO genome resource library
 
-The output of STAR aligner, STAR-Fusion, and Fusion-Inspector will be uploaded to an S3 bucket. This includes the most relevant output files, such as SJ.out.tab, aligned.bam, and chimeric.junctions.tab, and the fusion inspector HTML report.
+The output of STAR aligner, [STAR-Fusion](https://github.com/STAR-Fusion/STAR-Fusion/wiki), and [Fusion-Inspector](https://github.com/FusionInspector/FusionInspector/wiki) will be uploaded to an S3 bucket. This includes the most relevant output files, such as SJ.out.tab, aligned.bam, and chimeric.junctions.tab, and the fusion inspector HTML report. In addition, the fastq files undergo quality control checks and a multiQC report is generated and uploaded an S3 bucket.  The workflow also includes the [CICERO](https://github.com/stjude/CICERO) fusion detection algorithm that is run using the aligned.bam from STAR-aligner output.  
 
 The output files will be put into a directory that is named after the sample ID provided in the sample sheet file.  
 
-The docker image can be updated easily by selecting the latest image from the CTAT [docker hub](https://hub.docker.com/r/trinityctat/starfusion). Then update the `STAR_Fusion.nf` with the appropriate image and tag, such as `container "trinityctat/starfusion:1.10.0"`. 
+The STAR-Fusion docker image can be updated easily by selecting the latest image from the CTAT [docker hub](https://hub.docker.com/r/trinityctat/starfusion). Then update the `fusion-processes.nf` with the appropriate image and tag, such as `container "trinityctat/starfusion:1.10.0"`. 
 
 # To Run
 
-## First Step:
+## First Step: Sample Sheet
 
 First, create a sample manifest for the fastq files that are hosted in an S3 bucket. The manifest file is a simple 3 column, tab-delimited text file with the column names "Sample", "R1", and "R2", where R1 and R2 are paired end-fastqs.
 
@@ -51,7 +52,7 @@ fastqs <- get_bucket_df(bucket = BUCKET,
 ```
 
 
-## Second Step
+## Second Step: Execute the Workflow
 
 Edit the `main_run.sh` file to contain the correct output directory in `--output_folder` and point to the sample sheet in `--sample_sheet`. You can also update the filename for the output html report in `-with-report`. Then  simply call the script on the command line.
 
