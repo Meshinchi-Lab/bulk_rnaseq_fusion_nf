@@ -204,8 +204,13 @@ process CICERO {
   #index the bam file
   samtools index $BAM
 
+  #check that the bam file exists and is indexed
+  echo "The bam file input is: " $BAM
+  ls -1
+
+
   #run CICERO fusion detection algorithm
-	Cicero.sh -n 8 -b $BAM -g "GRCh37-lite" \
+	Cicero.sh -n 8 -b \$PWD/$BAM -g "GRCh37-lite" \
 		-r \$PWD/$cicero_genome_lib/ \
 		-o ${Sample}
 
