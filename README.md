@@ -21,21 +21,52 @@ First, create a sample manifest for the fastq files that are hosted in an S3 buc
 I have created a sample manifest file that can be used to select the appropriate files, with a demonstration in `Nextflow_AWS_Sample_Sheets_from_Manifest.ipynb` that uses the associated `create_sample_sheet.py`. Below is a very simple example directly on the command line.
 
 ```
-python3 create_sample_sheet.py "fh-pi-meshinchi-s" "fastq" --prefix "SR/picard_fq2/"
+python3 create_sample_sheet.py "my-s3-bucket" "Fastq" --prefix "TARGET_AML/RNAseq_Illumina_Data/Fastq/"
 ```
+
+This can also be accomplished using R with 
+
+```
+library(aws.s3)
+library(aws.signature)
+library(tidyr) 
+
+creds <- aws.signature::use_credentials(profile = "default")
+Sys.setenv("AWS_ACCESS_KEY_ID" = creds$default$AWS_ACCESS_KEY_ID,
+           "AWS_SECRET_ACCESS_KEY" = creds$default$AWS_SECRET_ACCESS_KEY,
+           "AWS_DEFAULT_REGION"="us-west-2")
+BUCKET="my-s3-bucket"
+PREFIX="TARGET_AML/RNAseq_Illumina_Data/Fastq"
+fastqs <- get_bucket_df(bucket = BUCKET, 
+                        prefix = PREFIX,
+                        max = Inf) %>%
+           mutate(filename=str_split_fixed(Key, pattern = "/", n=4)[,4],
+                  Sample=basename(filename),
+                  Read=case_when(
+                       grepl("_r[1].fq.gz|_R[1]_.+|r[1].fastq.gz", filename) ~ "R1", 
+                       grepl("_r[2].fq.gz|_R[2]_.+|r[2].fastq.gz", filename) ~ "R2")) %>% 
+           pivot_wider(id_cols=c(Sample), 
+                 names_from=Read, 
+                 values_from=filename)                      
+```
+
 
 ## Second Step
 
-Edit the `STAR_Fusion_run.sh` file to contain the correct output directory in `--output_folder` and point to the correct sample sheet in `--sample_sheet`. You can also update the filename for the output html report in `-with-report`. Then just simple call the script on the command line.
+Edit the `main_run.sh` file to contain the correct output directory in `--output_folder` and point to the sample sheet in `--sample_sheet`. You can also update the filename for the output html report in `-with-report`. Then  simply call the script on the command line.
 
 note: I have access to an HPC with specific software modules that can be loaded. If you have a custom installation of Nextflow, simply make sure the nextflow executable is in your PATH.
 
 ```
-./STAR_Fusion_run.sh
+./main_run.sh
 ```
 
-# CICERO Fusion NF
+# CICERO Fusion NF and Quality Control
 
-This repo also provides NF workflow for the [CICERO](https://github.com/stjude/CICERO) fusion detection algorithm. The image was build from the Dockerfile provided on the CICERO github without modification for v.0.3.0 and v.0.2.0.  
+This repo also provides a NF workflow for the [CICERO](https://github.com/stjude/CICERO) v1.7.1 fusion detection algorithm. The image was build from the Dockerfile provided on the CICERO github with minimal modification by removing the `ENTRYPOINT` command in order to be compatible with AWS Batch.
 
-The next steps are to create a [DSL2 Nextflow](https://www.nextflow.io/docs/latest/dsl2.html) workflow in order to make this a multipart workflow with options for runnng STAR or CICERO or both.
+Docker Image: https://hub.docker.com/repository/docker/jennylsmith/cicero 
+
+This CICERO step is currently included in  `main.nf` workflow, in addition to running [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) and [multiQC](https://multiqc.info/) on the input fastq files. 
+
+
