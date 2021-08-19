@@ -195,7 +195,7 @@ process CICERO {
 
 	//define output files to save to the output_folder by publishDir command
 	output:
-	path "${Sample}" optional true
+	path "${Sample}/CICERO_DATADIR" optional true
 
   script:
 	"""

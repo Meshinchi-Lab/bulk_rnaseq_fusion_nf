@@ -19,7 +19,7 @@ log.info """\
          .stripIndent()
 
 
-include { STAR_Fusion; MD5sums; fastqc; multiqc; CICERO } from './fusion-processes.nf'
+include { STAR_Fusion; fastqc; multiqc; CICERO } from './fusion-processes.nf'
 
 workflow  {
 
@@ -37,7 +37,6 @@ workflow  {
 
 		//processes are treated like functions
     STAR_Fusion(params.star_genome_lib, fqs_ch)
-    MD5sums(files_ch)
 
     //run QC on the fastq files
     fastqc(fqs_ch)
