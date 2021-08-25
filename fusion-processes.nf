@@ -20,6 +20,7 @@ process fastqc {
     """
     mkdir fastqc_${Sample}_logs
     fastqc -o fastqc_${Sample}_logs -t 6 -f fastq -q $R1 $R2
+    #rm $R1 $R2 to avoid repetitive upload to the S3 bucket
     """
 }
 
@@ -29,7 +30,7 @@ process fastqc {
 // mode:'copy'
 process multiqc {
 
-    publishDir params.multiQC
+    publishDir "$params.multiQC"
 
     //use image on quay.io
     container "quay.io/lifebitai/multiqc:latest"
@@ -41,13 +42,16 @@ process multiqc {
 
     input:
     path "*"
+    val sample_sheet
 
     output:
-    path 'multiqc_report.html'
+    path "${sample_sheet}_multiqc_report.html"
 
     script:
     """
-    multiqc -v .
+    set -eou pipefail
+
+    multiqc -v --filename "${sample_sheet}_multiqc_report.html"  .
     """
 }
 
@@ -72,11 +76,11 @@ process STAR_Fusion {
 
 	//define output files to save to the output_folder by publishDir command
 	output:
-	file "*Aligned.sortedByCoord.out.bam"
-	file "*SJ.out.tab"
-	file "*Log.final.out"
-	file "*Chimeric.out.junction"
-	file "${Sample}/*abridged.coding_effect.tsv"
+	path "*Aligned.sortedByCoord.out.bam", emit: BAM
+	path "*SJ.out.tab"
+	path "*Log.final.out"
+	path "*Chimeric.out.junction"
+	path "${Sample}/*abridged.coding_effect.tsv"
 	path "${Sample}/FusionInspector-inspect" optional true
 
   script:
@@ -181,7 +185,7 @@ process CICERO {
 	publishDir "$params.CICERO"
 
 	// use CICERO repo on docker hub.
-	container "jennylsmith/cicero:v1.7.1"
+	container "quay.io/jennylsmith/cicero:v1.7.1"
 	cpus 8
 	memory "64 GB"
 
@@ -195,7 +199,7 @@ process CICERO {
 
 	//define output files to save to the output_folder by publishDir command
 	output:
-	path "${Sample}/CICERO_DATADIR" optional true
+	path "${Sample}/CICERO_DATADIR/*/*.txt" optional true
 
   script:
 	"""
@@ -205,24 +209,21 @@ process CICERO {
   samtools index $BAM
 
   #run CICERO fusion detection algorithm
-	Cicero.sh -n 8 -b \$PWD/$BAM -g "GRCh37-lite" \
+  Cicero.sh -n 8 -b \$PWD/$BAM -g "GRCh37-lite" \
 		-r \$PWD/$cicero_genome_lib/ \
 		-o ${Sample}
 
-	echo ----------------------------------------
-	echo "list all output files in $PWD"
-	ls -1 \$PWD
+  echo -----------------------------------------
+  echo "list all output files in sample directory"
+  ls -1d $Sample/CICERO_DATADIR/
 
-	echo -----------------------------------------
-	echo "list all output files in sample directory"
-	ls -1 $Sample
 	"""
 }
 
 //Run tin.py for QC check on all BAM files and save output with the sample ID
 process tin_scores {
 
-	publishDir "$params.R/"
+	publishDir "$params.tin_scores/"
 
 	// use Bioconainers repo on quay.io.
 	container "quay.io/biocontainers/rseqc:4.0.0--py39h38f01e4_1"
@@ -233,9 +234,11 @@ process tin_scores {
 	errorStrategy "retry"
 
 	// declare the input types and its variable names
+  //Sample == SAMPLE_ID, BAM == location of BAM file, BAI == location of BAM file .bai index
+  //gene_model is pre-made reference file found at gene_model=$BASE_BUCKET/Reference_Data/RSeQC_Ref/hg19_Ensembl_gene.bed
 	input:
 	path gene_model
-	tuple val(Sample), file(BAM), file(INDEX)
+	tuple val(Sample), file(BAM), file(BAI)
 
 	//define output files to save to the output_folder by publishDir command
 	output:
@@ -244,13 +247,12 @@ process tin_scores {
   script:
 	"""
 	set -eou pipefail
-	ls -1 \$PWD
 
+  #Compute transcript integrity scores
 	tin.py -i $BAM -r $gene_model
-	rm $BAM #to avoid upload to workDir
 
-	echo ----------------------------------------
-	ls -1 \$PWD
+  #to avoid uploading BAM to workDir
+  rm $BAM
 	"""
 }
 
@@ -283,6 +285,5 @@ process MD5sums {
 
   hashes=${Filename}.md5
   md5sum $Filename > \$hashes
-
 	"""
 }
