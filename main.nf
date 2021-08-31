@@ -32,12 +32,10 @@ workflow  {
 		//processes are treated like functions
     STAR_Fusion(params.star_genome_lib, fqs_ch)
 
-    /*
     //run QC on the fastq files
     fastqc(fqs_ch)
     sample_sheet=file(params.sample_sheet)
     multiqc(fastqc.out.collect(), sample_sheet.simpleName)
-    */
 
     //CICERO needs to be dependent on the STAR_Fusion.out so its done sequentially.
     STAR_Fusion.out.BAM

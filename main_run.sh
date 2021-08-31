@@ -11,10 +11,9 @@ ml nextflow/20.09.0-edge
 #More Info:
 #https://github.com/FusionInspector/FusionInspector/wiki/FusionInspector-Outputs-Described
 
-#Execute the next flow workflow  $BASE_BUCKET/work
-#TARGET_AML_Remission_JMML_APL_MDAnderson_sample_sheet.txt
+#Execute the next flow workflow
 nextflow run -c ~/nextflow.config main.nf \
-    --sample_sheet sample_sheets/test_sample_sheet.txt \
+    --sample_sheet sample_sheets/TARGET_AML_Remission_JMML_APL_MDAnderson_sample_sheet.txt \
     --star_genome_lib $BASE_BUCKET/Reference_Data/GRCh37_gencode_v19_CTAT_lib_Oct012019/ctat_genome_lib_build_dir/ \
     --output_folder  $BASE_BUCKET/TARGET_AML/RNAseq_Illumina_Data/STAR_Fusion/ \
     --multiQC $BASE_BUCKET/TARGET_AML/RNAseq_Illumina_Data/multiQC/ \

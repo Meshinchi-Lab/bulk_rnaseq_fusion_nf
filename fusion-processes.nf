@@ -4,8 +4,8 @@ process fastqc {
 
     //use image on quay.io
     container "quay.io/biocontainers/fastqc:0.11.9--hdfd78af_1"
-    cpus 4
-    memory "32 GB"
+    cpus 2
+    memory "16 GB"
 
     // if process fails, retry running it
     errorStrategy "retry"
@@ -34,8 +34,8 @@ process multiqc {
 
     //use image on quay.io
     container "quay.io/lifebitai/multiqc:latest"
-    cpus 4
-    memory "32 GB"
+    cpus 2
+    memory "16 GB"
 
     // if process fails, retry running it
     errorStrategy "retry"
@@ -63,11 +63,6 @@ process STAR_Fusion {
 
 	// use TrinityCTAT repo on docker hub.
 	container "trinityctat/starfusion:1.8.1"
-	cpus 8
-	memory "64 GB"
-
-	// if process fails, retry running it
-	errorStrategy "retry"
 
 	// declare the input types and its variable names
 	input:
@@ -186,8 +181,8 @@ process CICERO {
 
 	// use CICERO repo on docker hub.
 	container "quay.io/jennylsmith/cicero:v1.7.1"
-	cpus 8
-	memory "64 GB"
+	cpus 2
+	memory "16 GB"
 
 	// if process fails, retry running it
 	errorStrategy "retry"
@@ -209,7 +204,7 @@ process CICERO {
   samtools index $BAM
 
   #run CICERO fusion detection algorithm
-  Cicero.sh -n 8 -b \$PWD/$BAM -g "GRCh37-lite" \
+  Cicero.sh -n 2 -b \$PWD/$BAM -g "GRCh37-lite" \
 		-r \$PWD/$cicero_genome_lib/ \
 		-o ${Sample}
 
@@ -227,7 +222,7 @@ process tin_scores {
 
 	// use Bioconainers repo on quay.io.
 	container "quay.io/biocontainers/rseqc:4.0.0--py39h38f01e4_1"
-	cpus 4
+	cpus 2
 	memory "16 GB"
 
 	// if process fails, retry running it
@@ -263,7 +258,7 @@ process MD5sums {
 
 	// use ubuntu repo on docker hub.
 	container "ubuntu:latest"
-	cpus 4
+	cpus 2
 	memory "16 GB"
 
 	// if process fails, retry running it
