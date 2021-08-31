@@ -63,6 +63,7 @@ process STAR_Fusion {
 
 	// use TrinityCTAT repo on docker hub.
 	container "trinityctat/starfusion:1.8.1"
+  label 'star_increasing_mem'
 
 	// declare the input types and its variable names
 	input:
