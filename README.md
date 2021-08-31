@@ -74,3 +74,4 @@ This CICERO step is currently included in  `main.nf` workflow, in addition to ru
 
 * [Tutorial](https://github.com/nextflow-io/nfcamp-tutorial)
 * [Documentation](https://www.nextflow.io/docs/latest/dsl2.html)
+* [Dynamic memory allocation](https://lucacozzuto.medium.com/handling-failing-jobs-with-nextflow-24405b97b679)
