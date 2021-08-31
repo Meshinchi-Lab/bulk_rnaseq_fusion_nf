@@ -122,15 +122,6 @@ process STAR_Fusion {
 	  	--denovo_reconstruct \
 	  	--output_dir $Sample
 
-
-	echo ----------------------------------------
-	echo "list all output files in $PWD"
-	ls -1 \$PWD
-
-	echo -----------------------------------------
-	echo "list all output files in sample directory"
-	ls -1 $Sample
-
 	"""
 }
 
@@ -201,18 +192,23 @@ process CICERO {
 	"""
 	set -eou pipefail
 
+  #list all files in the container
+  echo  -------------
+  echo "the bam file is" $BAM
+  ls -alh
+  echo  -------------
+
   #index the bam file
   samtools index $BAM
 
   #run CICERO fusion detection algorithm
-  Cicero.sh -n 2 -b \$PWD/$BAM -g "GRCh37-lite" \
+  Cicero.sh -n 2 -b $BAM -g "GRCh37-lite" \
 		-r \$PWD/$cicero_genome_lib/ \
 		-o ${Sample}
 
   echo -----------------------------------------
   echo "list all output files in sample directory"
   ls -1d $Sample/CICERO_DATADIR/
-
 	"""
 }
 
