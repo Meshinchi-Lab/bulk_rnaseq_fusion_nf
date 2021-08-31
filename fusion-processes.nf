@@ -83,7 +83,16 @@ process STAR_Fusion {
 	"""
 	set -eou pipefail
 
-	STAR --genomeDir \$PWD/$genome_lib/ref_genome.fa.star.idx \
+
+  #list all files in the container
+  echo  -------------
+  echo "the genome lib is file is" $genome_lib
+  ls -alh \$PWD/$genome_lib/ref_genome.fa.star.idx
+  ls -alh
+  echo  -------------
+
+	STAR --runMode alignReads \
+      --genomeDir \$PWD/$genome_lib/ref_genome.fa.star.idx \
 			--runThreadN 8 \
 			--readFilesIn $R1 $R2 \
 			--outFileNamePrefix $Sample \
