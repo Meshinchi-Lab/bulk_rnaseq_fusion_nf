@@ -62,7 +62,7 @@ process STAR_Fusion {
 	publishDir "$params.output_folder/"
 
 	// use TrinityCTAT repo on docker hub.
-	container "trinityctat/starfusion:1.8.1"
+	container "quay.io/jennylsmith/starfusion:1.8.1"
   label 'star_increasing_mem'
 
 	// declare the input types and its variable names
@@ -141,7 +141,7 @@ process build_genome_refs {
 	publishDir "$params.output_folder/"
 
 	// use TrinityCTAT repo on docker hub.
-	container "trinityctat/starfusion:1.10.0"
+	container "quay.io/jennylsmith/starfusion:1.8.1"
 	cpus 16
 	memory "126 GB"
 
