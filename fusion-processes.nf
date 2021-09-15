@@ -61,9 +61,9 @@ process STAR_Fusion {
 
 	publishDir "$params.output_folder/"
 
-	// use TrinityCTAT repo on docker hub.
+	// use TrinityCTAT image repo on Quay.io
 	container "quay.io/jennylsmith/starfusion:1.8.1"
-  label 'star_increasing_mem'
+	label 'star_increasing_mem'
 
 	// declare the input types and its variable names
 	input:
@@ -92,39 +92,39 @@ process STAR_Fusion {
   echo  -------------
 
 	STAR --runMode alignReads \
-      --genomeDir \$PWD/$genome_lib/ref_genome.fa.star.idx \
-			--runThreadN 8 \
-			--readFilesIn $R1 $R2 \
-			--outFileNamePrefix $Sample \
-			--outReadsUnmapped None \
-			--twopassMode Basic \
-			--twopass1readsN -1 \
-			--readFilesCommand "gunzip -c" \
-			--outSAMunmapped Within \
-			--outSAMtype BAM SortedByCoordinate \
-			--limitBAMsortRAM 63004036730 \
-			--outSAMattributes NH HI NM MD AS nM jM jI XS \
-			--chimSegmentMin 12 \
-			--chimJunctionOverhangMin 12 \
-			--chimOutJunctionFormat 1 \
-			--alignSJDBoverhangMin 10 \
-			--alignMatesGapMax 100000 \
-			--alignIntronMax 100000 \
-			--alignSJstitchMismatchNmax 5 -1 5 5 \
-			--outSAMattrRGline ID:GRPundef \
-			--chimMultimapScoreRange 3 \
-			--chimScoreJunctionNonGTAG -4 \
-		  --chimMultimapNmax 20 \
-			--chimNonchimScoreDropMin 10 \
-			--peOverlapNbasesMin 12 \
-			--peOverlapMMp 0.1 \
-			--chimFilter banGenomicN
+    	--genomeDir \$PWD/$genome_lib/ref_genome.fa.star.idx \
+		--runThreadN 8 \
+		--readFilesIn $R1 $R2 \
+		--outFileNamePrefix $Sample \
+		--outReadsUnmapped None \
+		--twopassMode Basic \
+		--twopass1readsN -1 \
+		--readFilesCommand "gunzip -c" \
+		--outSAMunmapped Within \
+		--outSAMtype BAM SortedByCoordinate \
+		--limitBAMsortRAM 63004036730 \
+		--outSAMattributes NH HI NM MD AS nM jM jI XS \
+		--chimSegmentMin 12 \
+		--chimJunctionOverhangMin 12 \
+		--chimOutJunctionFormat 1 \
+		--alignSJDBoverhangMin 10 \
+		--alignMatesGapMax 100000 \
+		--alignIntronMax 100000 \
+		--alignSJstitchMismatchNmax 5 -1 5 5 \
+		--outSAMattrRGline ID:GRPundef \
+		--chimMultimapScoreRange 3 \
+		--chimScoreJunctionNonGTAG -4 \
+		--chimMultimapNmax 20 \
+		--chimNonchimScoreDropMin 10 \
+		--peOverlapNbasesMin 12 \
+		--peOverlapMMp 0.1 \
+		--chimFilter banGenomicN
 
 
 	/usr/local/src/STAR-Fusion/STAR-Fusion --genome_lib_dir \$PWD/$genome_lib \
 	  	--chimeric_junction "${Sample}Chimeric.out.junction" \
-			--left_fq $R1 \
-			--right_fq $R2 \
+		--left_fq $R1 \
+		--right_fq $R2 \
 	  	--CPU 8 \
 	  	--FusionInspector inspect \
 	  	--examine_coding_effect \
@@ -163,11 +163,11 @@ process build_genome_refs {
 	ls -alh \$PWD
 
 	\$STAR_FUSION_HOME/ctat-genome-lib-builder/prep_genome_lib.pl \
-	                       	--genome_fa \$PWD/$GENOME \
-			 	                  --gtf \$PWD/$GTF \
-				                  --dfam_db $DFAM \
-	                       	--pfam_db $PFAM \
-	                       	--CPU 16
+	        --genome_fa \$PWD/$GENOME \
+			--gtf \$PWD/$GTF \
+			--dfam_db $DFAM \
+	        --pfam_db $PFAM \
+	        --CPU 16
 
 	find . -name "ctat_genome_lib_build_dir" -type d
 

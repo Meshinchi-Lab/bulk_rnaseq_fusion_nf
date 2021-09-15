@@ -23,13 +23,13 @@ include { STAR_Fusion; fastqc; multiqc; CICERO } from './fusion-processes.nf'
 
 workflow  {
 
-		// Define the input paired fastq files in a sample sheet and genome references.
-		//The sample_sheet is tab separated with column names "Sample","R1","R2"
-		fqs_ch = Channel.fromPath(file(params.sample_sheet))
+	// Define the input paired fastq files in a sample sheet and genome references.
+	//The sample_sheet is tab separated with column names "Sample","R1","R2"
+	fqs_ch = Channel.fromPath(file(params.sample_sheet))
 				.splitCsv(header: true, sep: '\t')
 				.map { sample -> [sample["Sample"] + "_", file(sample["R1"]), file(sample["R2"])]}
 
-		//processes are treated like functions
+	//processes are treated like functions
     STAR_Fusion(params.star_genome_lib, fqs_ch)
 
     //run QC on the fastq files
