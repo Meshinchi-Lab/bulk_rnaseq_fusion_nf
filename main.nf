@@ -43,5 +43,5 @@ workflow  {
         .set { bam_ch }
 
     //Run CICERO on the STAR-aligner BAM files.
-    CICERO(params.cicero_genome_lib, bam_ch)
+    //CICERO(params.cicero_genome_lib, bam_ch)
 }
