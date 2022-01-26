@@ -59,10 +59,10 @@ process multiqc {
 //Run star-fusion on all fastq pairs and save output with the sample ID
 process STAR_Fusion {
 
-	publishDir "$params.output_folder/"
+	publishDir "$params.STAR_Fusion_out/"
 
-	// use TrinityCTAT image repo on Quay.io
-	container "quay.io/jennylsmith/starfusion:1.8.1"
+	// use TrinityCTAT image repo on Quay.io from Biocontainers
+	container "quay.io/biocontainers/star-fusion:1.10.0--hdfd78af_1"
 	label 'star_increasing_mem'
 
 	// declare the input types and its variable names
@@ -84,12 +84,12 @@ process STAR_Fusion {
 	set -eou pipefail
 
 
-  #list all files in the container
-  echo  -------------
-  echo "the genome lib is file is" $genome_lib
-  ls -alh \$PWD/$genome_lib/ref_genome.fa.star.idx
-  ls -alh
-  echo  -------------
+	#list all files in the container
+	echo  -------------
+	echo "the genome lib is file is" $genome_lib
+	ls -alh \$PWD/$genome_lib/ref_genome.fa.star.idx
+	ls -alh
+	echo  -------------
 
 	STAR --runMode alignReads \
     	--genomeDir \$PWD/$genome_lib/ref_genome.fa.star.idx \
@@ -120,8 +120,7 @@ process STAR_Fusion {
 		--peOverlapMMp 0.1 \
 		--chimFilter banGenomicN
 
-
-	/usr/local/src/STAR-Fusion/STAR-Fusion --genome_lib_dir \$PWD/$genome_lib \
+	STAR-Fusion --genome_lib_dir \$PWD/$genome_lib \
 	  	--chimeric_junction "${Sample}Chimeric.out.junction" \
 		--left_fq $R1 \
 		--right_fq $R2 \
@@ -138,10 +137,10 @@ process STAR_Fusion {
 //build a CTAT resource library for STAR-Fusion use.
 process build_genome_refs {
 
-	publishDir "$params.output_folder/"
+	publishDir "$params.Reference_Data/"
 
-	// use TrinityCTAT repo on docker hub.
-	container "quay.io/jennylsmith/starfusion:1.8.1"
+	// use TrinityCTAT image from biocontainers
+	container "quay.io/biocontainers/star-fusion:1.10.0--hdfd78af_1"
 	cpus 16
 	memory "126 GB"
 
@@ -159,10 +158,7 @@ process build_genome_refs {
   script:
 	"""
 	set -eou pipefail
-	echo \$STAR_FUSION_HOME
-	ls -alh \$PWD
-
-	\$STAR_FUSION_HOME/ctat-genome-lib-builder/prep_genome_lib.pl \
+	prep_genome_lib.pl \
 	        --genome_fa \$PWD/$GENOME \
 			--gtf \$PWD/$GTF \
 			--dfam_db $DFAM \
@@ -174,11 +170,78 @@ process build_genome_refs {
 	"""
 }
 
+//Build GRCh37-lite index for CICERO 
+process STAR_index {
+	publishDir "./Reference_Data/"
+
+	// use TrinityCTAT repo on docker hub.
+	container "quay.io/jennylsmith/starfusion:1.8.1"
+	cpus 4
+	memory "32 GB"
+
+	// if process fails, retry running it
+	errorStrategy "retry"
+
+	//inputs 
+	input: 
+	tuple val(URL), val(star_index_dir)
+	path genome_fasta
+
+	script:
+	"""
+	set -eou pipefail 
+
+	curl -L -o ref.gtf "$URL" 
+	STAR --runThreadN 4 \
+		--runMode genomeGenerate \
+		--genomeDir $star_index_dir \
+		--genomeFastaFiles $genome_fasta \
+		--sjdbGTFfile ref.gtf 
+	"""
+}
+
+process STAR_aligner {
+	publishDir "$params.STAR_aligner_out/"
+
+	// use TrinityCTAT image repo on Quay.io from Biocontainers
+	container "quay.io/biocontainers/star-fusion:1.10.0--hdfd78af_1"
+	label 'star_increasing_mem'
+	
+	input:
+	path star_index_dir
+	tuple val(Sample), file(R1), file(R2)
+
+	output:
+	path "*.bam", emit: BAM
+	path "*SJ.out.tab"
+	path "*Log.final.out"
+
+	script:
+	"""
+	set -eou pipefail 
+
+	genome_idx=\$(basename ${star_index_dir})
+	echo \$genome_idx
+
+	STAR --runMode alignReads \
+    	--genomeDir  $star_index_dir \
+		--runThreadN 8 \
+		--readFilesIn $R1 $R2 \
+		--outFileNamePrefix ${Sample} \
+		--outReadsUnmapped None \
+		--twopassMode Basic \
+		--twopass1readsN -1 \
+		--readFilesCommand "gunzip -c" \
+		--outSAMunmapped Within \
+		--outSAMtype BAM \
+		--outSAMattributes NH HI NM MD AS nM jM jI XS 
+	"""
+}
 
 //Run CICERO fusion detection on all bam files and save output with the sample ID
 process CICERO {
 
-	publishDir "$params.CICERO"
+	publishDir "$params.CICERO_out"
 
 	// use CICERO repo on docker hub.
 	container "quay.io/jennylsmith/cicero:v1.7.1"
@@ -197,27 +260,27 @@ process CICERO {
 	output:
 	path "${Sample}/CICERO_DATADIR/*/*.txt" optional true
 
-  script:
+ 	script:
 	"""
 	set -eou pipefail
 
-  #list all files in the container
-  echo  -------------
-  echo "the bam file is" $BAM
-  ls -alh
-  echo  -------------
+	#list all files in the container
+	echo  -------------
+	echo "the bam file is" $BAM
+	ls -alh
+	echo  -------------
 
-  #index the bam file
-  samtools index $BAM
+	#index the bam file
+	samtools index $BAM
 
-  #run CICERO fusion detection algorithm
-  Cicero.sh -n 2 -b $BAM -g "GRCh37-lite" \
-		-r \$PWD/$cicero_genome_lib/ \
-		-o ${Sample}
+	#run CICERO fusion detection algorithm
+	Cicero.sh -n 2 -b $BAM -g "GRCh37-lite" \
+			-r \$PWD/$cicero_genome_lib/ \
+			-o ${Sample}
 
-  echo -----------------------------------------
-  echo "list all output files in sample directory"
-  ls -1d $Sample/CICERO_DATADIR/
+	echo -----------------------------------------
+	echo "list all output files in sample directory"
+	ls -1d $Sample/CICERO_DATADIR/
 	"""
 }
 
@@ -245,15 +308,14 @@ process tin_scores {
 	output:
 	file "*"
 
-  script:
+	script:
 	"""
 	set -eou pipefail
 
-  #Compute transcript integrity scores
-	tin.py -i $BAM -r $gene_model
-
-  #to avoid uploading BAM to workDir
-  rm $BAM
+	#Compute transcript integrity scores
+		tin.py -i $BAM -r $gene_model
+	#to avoid uploading BAM to workDir
+	rm $BAM
 	"""
 }
 
@@ -278,13 +340,12 @@ process MD5sums {
 	output:
 	file "*.md5"
 
-  script:
+	script:
 	"""
 	set -eou pipefail
 
 	echo "Creating MD5sum checks"
-
-  hashes=${Filename}.md5
-  md5sum $Filename > \$hashes
+	hashes=${Filename}.md5
+	md5sum $Filename > \$hashes
 	"""
 }

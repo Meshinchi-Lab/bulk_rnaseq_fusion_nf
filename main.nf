@@ -2,9 +2,9 @@ nextflow.enable.dsl=2
 
 
 // define the output directories.
-params.output_folder = "./starfusion/"
-params.CICERO = "./CICERO/"
-params.multiQC = "./multiqc/"
+params.STAR_Fusion = "./starfusion/"
+params.CICERO_out = "./CICERO/"
+params.multiQC_out = "./multiqc/"
 
 
 //Define message for the process logs.
@@ -19,7 +19,7 @@ log.info """\
          .stripIndent()
 
 
-include { STAR_Fusion; fastqc; multiqc; CICERO } from './fusion-processes.nf'
+include { STAR_Fusion; fastqc; multiqc; star_index; STAR_aligner; CICERO } from './fusion-processes.nf'
 
 workflow  {
 
@@ -28,7 +28,7 @@ workflow  {
 	fqs_ch = Channel.fromPath(file(params.sample_sheet))
 				.splitCsv(header: true, sep: '\t')
 				.map { sample -> [sample["Sample"] + "_", file(sample["R1"]), file(sample["R2"])]}
-
+    /*
 	//processes are treated like functions
     STAR_Fusion(params.star_genome_lib, fqs_ch)
 
@@ -36,12 +36,17 @@ workflow  {
     fastqc(fqs_ch)
     sample_sheet=file(params.sample_sheet)
     multiqc(fastqc.out.collect(), sample_sheet.simpleName)
+    */
 
-    //CICERO needs to be dependent on the STAR_Fusion.out so its done sequentially.
-    STAR_Fusion.out.BAM
+    //Create the GRCh37-lite STAR index (how to make this optional?) and then align with STAR, then CICERO
+    STAR_index(params.genome_fasta, params.gtf_url, params.star_index_dir)
+    STAR_aligner(params.star_index_dir, fqs_ch)
+
+    //CICERO requires GRCh37-lite aligned BAMs, so dependent on STAR-aligner BAM 
+    STAR_aligner.out.BAM
         .map { BAM  -> [BAM.baseName.split(/_Aligned.+/)[0], file(BAM)] }
         .set { bam_ch }
 
     //Run CICERO on the STAR-aligner BAM files.
-    //CICERO(params.cicero_genome_lib, bam_ch)
+    CICERO(params.cicero_genome_lib, bam_ch)
 }
