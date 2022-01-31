@@ -62,7 +62,7 @@ process STAR_Fusion {
 	publishDir "$params.STAR_Fusion_out/"
 
 	// use TrinityCTAT image repo on Quay.io from Biocontainers
-	container "quay.io/biocontainers/star-fusion:1.10.0--hdfd78af_1"
+	container "quay.io/biocontainers/star-fusion:1.9.1--0"
 	label 'star_increasing_mem'
 
 	// declare the input types and its variable names
@@ -140,7 +140,7 @@ process build_genome_refs {
 	publishDir "$params.Reference_Data/"
 
 	// use TrinityCTAT image from biocontainers
-	container "quay.io/biocontainers/star-fusion:1.10.0--hdfd78af_1"
+	container "quay.io/biocontainers/star-fusion:1.9.1--0"
 	cpus 16
 	memory "126 GB"
 
@@ -172,31 +172,36 @@ process build_genome_refs {
 
 //Build GRCh37-lite index for CICERO 
 process STAR_index {
-	publishDir "./Reference_Data/"
+	publishDir "$params.star_index_out"
 
-	// use TrinityCTAT repo on docker hub.
+	// use person
 	container "quay.io/jennylsmith/starfusion:1.8.1"
-	cpus 4
-	memory "32 GB"
+	cpus 16
+	memory "315 GB"
 
 	// if process fails, retry running it
 	errorStrategy "retry"
 
-	//inputs 
+	//input genome fasta and gtf
 	input: 
-	tuple val(URL), val(star_index_dir)
-	path genome_fasta
+	path fasta
+	path gtf
+	
+	//output the index into a diretory, and the logfile
+	output:
+	path "*/GenomeDir"
+	path "Log.out"
 
 	script:
 	"""
-	set -eou pipefail 
+	set -eou 
 
-	curl -L -o ref.gtf "$URL" 
-	STAR --runThreadN 4 \
+	mkdir \$PWD/GenomeDir
+	STAR --runThreadN 16 \
 		--runMode genomeGenerate \
-		--genomeDir $star_index_dir \
-		--genomeFastaFiles $genome_fasta \
-		--sjdbGTFfile ref.gtf 
+		--genomeDir \$PWD/GenomeDir \
+		--genomeFastaFiles $fasta \
+		--sjdbGTFfile $gtf
 	"""
 }
 
@@ -204,11 +209,11 @@ process STAR_aligner {
 	publishDir "$params.STAR_aligner_out/"
 
 	// use TrinityCTAT image repo on Quay.io from Biocontainers
-	container "quay.io/biocontainers/star-fusion:1.10.0--hdfd78af_1"
+	container "quay.io/biocontainers/star-fusion:1.9.1--0"
 	label 'star_increasing_mem'
 	
 	input:
-	path star_index_dir
+	path star_index_out
 	tuple val(Sample), file(R1), file(R2)
 
 	output:
@@ -220,11 +225,11 @@ process STAR_aligner {
 	"""
 	set -eou pipefail 
 
-	genome_idx=\$(basename ${star_index_dir})
+	genome_idx=\$(basename ${star_index_out})
 	echo \$genome_idx
 
 	STAR --runMode alignReads \
-    	--genomeDir  $star_index_dir \
+    	--genomeDir  \$PWD/$star_index_out \
 		--runThreadN 8 \
 		--readFilesIn $R1 $R2 \
 		--outFileNamePrefix ${Sample} \
@@ -244,7 +249,7 @@ process CICERO {
 	publishDir "$params.CICERO_out"
 
 	// use CICERO repo on docker hub.
-	container "quay.io/jennylsmith/cicero:v1.7.1"
+	container "quay.io/jennylsmith/cicero:df59166"
 	cpus 2
 	memory "16 GB"
 
@@ -282,6 +287,21 @@ process CICERO {
 	echo "list all output files in sample directory"
 	ls -1d $Sample/CICERO_DATADIR/
 	"""
+}
+
+//Helper function to unzip files when needed 
+process unzip {
+
+  input:
+	  path zipped_file  
+
+	output:
+	  path "*", emit: unzipped_file
+
+	script:
+    """
+    gunzip -f $zipped_file 
+    """
 }
 
 //Run tin.py for QC check on all BAM files and save output with the sample ID

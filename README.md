@@ -11,7 +11,7 @@ The output of STAR aligner, [STAR-Fusion](https://github.com/STAR-Fusion/STAR-Fu
 
 The output files will be put into a directory that is named after the sample ID provided in the sample sheet file.  
 
-The STAR-Fusion docker image can be updated easily by selecting the latest image from the CTAT [docker hub](https://hub.docker.com/r/trinityctat/starfusion). Then update the `fusion-processes.nf` with the appropriate image and tag, such as `container "trinityctat/starfusion:1.10.0"`. 
+The STAR-Fusion docker image can be updated easily by selecting the latest image from either 1) the CTAT [docker hub](https://hub.docker.com/r/trinityctat/starfusion) or [quay.io](quay.io). Then update the `fusion-processes.nf` with the appropriate image and tag. The containers utilized here were developed by `biocontainers` repository on quay.io, and images *must not* include `ENTRYPOINT` or it may cause errors when executed through AWS S3. 
 
 # To Run
 
@@ -54,9 +54,11 @@ fastqs <- get_bucket_df(bucket = BUCKET,
 
 ## Second Step: Execute the Workflow
 
-Edit the `main_run.sh` file to contain the correct output directory in `--output_folder` and point to the sample sheet in `--sample_sheet`. You can also update the filename for the output html report in `-with-report`. Then  simply call the script on the command line.
+Edit the `main_run.sh` file to contain the correct output directories and point to the sample sheet in `--sample_sheet`. You can also update the filename for the output html report in `-with-report`. Then  simply call the script on the command line.
 
-note: I have access to an HPC with specific software modules that can be loaded. If you have a custom installation of Nextflow, simply make sure the nextflow executable is in your PATH.
+The nextflow config file can be specified by upating the variable `NFX_CONFIG` for the workflow to be run locally, on AWS Batch, or using Singularity on an HPC system. 
+
+note: I have access to an HPC with specific software modules that can be loaded. If you have a custom installation of Nextflow, make sure the nextflow executable is in your PATH.
 
 ```
 ./main_run.sh
