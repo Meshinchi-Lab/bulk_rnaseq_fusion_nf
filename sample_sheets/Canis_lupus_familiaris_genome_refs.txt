@@ -1,2 +1,0 @@
-GENOME	GTF	DFAM	PFAM
-s3://fh-pi-meshinchi-s-eco-public/Reference_Data/CanFam3.1_Ensembl_v103_CTAT_lib/Canis_lupus_familiaris.CanFam3.1.dna.toplevel.fa	s3://fh-pi-meshinchi-s-eco-public/Reference_Data/CanFam3.1_Ensembl_v103_CTAT_lib/Canis_lupus_familiaris.CanFam3.1.103.gtf	s3://fh-pi-meshinchi-s-eco-public/Reference_Data/CanFam3.1_Ensembl_v103_CTAT_lib/Dfam.hmm	s3://fh-pi-meshinchi-s-eco-public/Reference_Data/CanFam3.1_Ensembl_v103_CTAT_lib/Pfam-A.hmm

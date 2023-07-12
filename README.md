@@ -1,6 +1,6 @@
 # STAR-fusion NF
 
- STAR-fusion run on AWS Batch using the Nextflow workflow manager.
+ STAR-fusion run using the Nextflow workflow manager.
 
  This workflow requires:
   1. Sample sheet, tab delimited

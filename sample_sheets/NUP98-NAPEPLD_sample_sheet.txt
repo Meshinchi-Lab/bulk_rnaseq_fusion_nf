@@ -1,2 +1,0 @@
-Sample	R1	R2
-TARGET-20-PANYSN-03A-04R	s3://fh-pi-meshinchi-s/SR/SRA/SRA_TARGET-20-PANYSN-03A-04R_r1.fastq.gz	s3://fh-pi-meshinchi-s/SR/SRA/SRA_TARGET-20-PANYSN-03A-04R_r2.fastq.gz

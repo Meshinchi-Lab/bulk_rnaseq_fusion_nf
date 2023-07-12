@@ -1,10 +1,10 @@
 #!/bin/bash
 set -e
 DATE=$(date +%F)
-NFX_CONFIG=~/nextflow.singularity.config
+# Change NFX_CONFIG to nextflow.aws.config if needed for AWS executor. 
+NFX_CONFIG=./nextflow.singularity.config
 
 # Load the modules
-ml nextflow/20.09.0-edge
 ml Singularity
 export PATH=$SINGULARITYROOT/bin/:$PATH
 
