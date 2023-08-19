@@ -11,7 +11,9 @@ The output of STAR aligner, [STAR-Fusion](https://github.com/STAR-Fusion/STAR-Fu
 
 The output files will be put into a directory that is named after the sample ID provided in the sample sheet file.  
 
-The STAR-Fusion docker image can be updated easily by selecting the latest image from either 1) the CTAT [docker hub](https://hub.docker.com/r/trinityctat/starfusion) or [quay.io](quay.io). Then update the `fusion-processes.nf` with the appropriate image and tag. The containers utilized here were developed by `biocontainers` repository on quay.io, and images *must not* include `ENTRYPOINT` or it may cause errors when executed through AWS S3. 
+The STAR-Fusion docker image can be updated easily by selecting the latest image from either 1) the CTAT [docker hub](https://hub.docker.com/r/trinityctat/starfusion) or [quay.io](quay.io). Then update the `fusion-processes.nf` with the appropriate image and tag. The containers utilized here were developed by `biocontainers` repository on quay.io, and images *must not* include `ENTRYPOINT` or it may cause errors when executed through AWS S3.  
+
+The pre-build STAR-Fusion genome references can be found [here](https://data.broadinstitute.org/Trinity/CTAT_RESOURCE_LIB/__genome_libs_StarFv1.10/)
 
 # To Run
 
@@ -64,13 +66,17 @@ note: I have access to an HPC with specific software modules that can be loaded.
 ./main_run.sh
 ```
 
-# CICERO Fusion NF and Quality Control
+# CICERO Fusion Detection
 
 This repo also provides a NF workflow for the [CICERO](https://github.com/stjude/CICERO) v1.7.1 fusion detection algorithm. The image was build from the Dockerfile provided on the CICERO github with minimal modification by removing the `ENTRYPOINT` command in order to be compatible with AWS Batch.
 
+The genome references for CICERO can be found [here](https://www.bcgsc.ca/downloads/genomes/9606/hg19/1000genomes/bwa_ind/genome/GRCh37-lite.fa) and [here](https://doi.org/10.5281/zenodo.3817656).
+
 Docker Image: https://hub.docker.com/repository/docker/jennylsmith/cicero 
 
-This CICERO step is currently included in  `main.nf` workflow, in addition to running [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) and [multiQC](https://multiqc.info/) on the input fastq files. 
+## Quality Control 
+
+In addition, running [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) and [multiQC](https://multiqc.info/) on the input fastq files. 
 
 # DSL2 Resources
 

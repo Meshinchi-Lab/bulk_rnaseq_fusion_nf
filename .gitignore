@@ -6,7 +6,7 @@
 test_data/
 resources/
 *.bak
-
+separate_modules.sh
 #Python notebooks
 __pycache__/
 .ipynb_checkpoints/

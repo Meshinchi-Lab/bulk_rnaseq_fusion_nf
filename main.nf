@@ -49,44 +49,36 @@ Required Arguments:
 
 //Workflow to create an index for STAR-aligner given a human genome fasta and the URL location of the GTF file. 
 workflow star_index {
-    //Download and stage the GTF file from a given URL 
-    Channel.fromPath(params.gtf_url)
-        .ifEmpty { error  "No file found at URL ${params.gtf_url}" }
-        .set{gtf}    
+    //Download and stage the GTF file 
+    Channel.fromPath(file(params.gtf, checkIfExists: true))
+        .set{ gtf }
      //if gtf is gzipped, it must be decompressed   
-    if(params.gtf_url.endsWith(".gz")){
+    if(params.gtf.endsWith(".gz")){
         gunzip_gtf(gtf)
-        gunzip_gtf.out.unzipped_file.set{gtf}
+        gunzip_gtf.out.unzipped_file
+            .set{ gtf }
     } 
     //Stage the genome fasta files for the index building step
-    Channel.fromPath(params.fasta_file)
-        .ifEmpty { error "No files found matching the pattern ${params.fasta_file}." }
-        .set{fasta}
+    Channel.fromPath(file(params.fasta_file, checkIfExists: true))
+        .set{ fasta }
     // if fasta  is gzipped, it must be decompressed   
     if(params.fasta_file.endsWith(".gz")){
         gunzip_fasta(fasta)
         gunzip_fasta.out.unzipped_file.set{fasta}
-    } 
-    //if genome fasta channel filtered to gzipped files is empty (therefore 0 gzipped fasta files prensent)
-    //fasta_pattern = "${params.genome_dir}/*.{fa,fasta,fa.gz,fasta.gz}"
-    //check = fasta.filter( ~/^.+gz/ ).ifEmpty{ 'EMPTY' } =~ 'EMPTY' ? "not_gzipped" : "gzipped"
-    //if( check ==~ 'gzipped' ){
-    //     gunzip_fasta(fasta)
-    //     gunzip_fasta.out.unzipped_file.set{fasta}
-    // }
- 
+    }
     //Call STAR genomeGenerate to build the index
     STAR_index(fasta, gtf)
 }
 
 workflow  fusion_calls {
-	// Define the input paired fastq files in a sample sheet and genome references.
-	//The sample_sheet is tab separated with column names "Sample","R1","R2"
-	fqs_ch = Channel.fromPath(file(params.sample_sheet))
-				.splitCsv(header: true, sep: '\t')
-				.map { sample -> [sample["Sample"] + "_", file(sample["R1"]), file(sample["R2"])]}
+    // Define the input paired fastq files in a sample sheet and genome references.
+    //The sample_sheet is comma separated with column names "Sample","R1","R2"
+    Channel.fromPath(file(params.sample_sheet))
+        .splitCsv(header: true, sep: ',')
+        .map { sample -> [ sample["Sample"] + "_", file(sample["R1"], checkIfExists: true), file(sample["R2"], checkIfExists: true) ]}
+        .set { fqs_ch }
 
-	//processes are treated like functions
+    //processes are treated like functions
     STAR_Fusion(params.star_genome_lib, fqs_ch)
 
     //run QC on the fastq files
