@@ -5,8 +5,10 @@
 # project specific
 test_data/
 resources/
+results/
 *.bak
 separate_modules.sh
+
 #Python notebooks
 __pycache__/
 .ipynb_checkpoints/

@@ -13,14 +13,14 @@ log.info """\
 
 include {
         unzip as gunzip_fasta
-        unzip as gunzip_gtf } from './modules/fusion-processes.nf'
+        unzip as gunzip_gtf } from './modules/local/fusion-processes.nf'
 
 include { STAR_Fusion; 
         fastqc; 
         multiqc; 
         STAR_index; 
         STAR_aligner; 
-        CICERO } from './modules/fusion-processes.nf'
+        CICERO } from './modules/local/fusion-processes.nf'
 
 // Function which prints help message text
 def helpMessage() {
@@ -75,22 +75,24 @@ workflow  fusion_calls {
     //The sample_sheet is comma separated with column names "Sample","R1","R2"
     Channel.fromPath(file(params.sample_sheet))
         .splitCsv(header: true, sep: ',')
-        .map { sample -> [ sample["Sample"] + "_", file(sample["R1"], checkIfExists: true), file(sample["R2"], checkIfExists: true) ]}
+        .map { sample -> [ sample["Sample"] + "_", 
+                           file(sample["R1"], checkIfExists: true), 
+                           file(sample["R2"], checkIfExists: true) ]
+            }
         .set { fqs_ch }
-
-    //processes are treated like functions
-    STAR_Fusion(params.star_genome_lib, fqs_ch)
 
     //run QC on the fastq files
     fastqc(fqs_ch)
     sample_sheet=file(params.sample_sheet)
     multiqc(fastqc.out.collect(), sample_sheet.simpleName)
 
-    STAR_aligner(params.star_index_out, fqs_ch)
+    //processes are treated like functions
+    STAR_Fusion(params.star_genome_lib, fqs_ch)
 
     //CICERO requires GRCh37-lite aligned BAMs, so dependent on STAR-aligner BAM 
+    STAR_aligner(params.star_index_out, fqs_ch)
     STAR_aligner.out.BAM
-        .map { BAM  -> [BAM.baseName.split(/_Aligned.+/)[0], file(BAM)] }
+        .map { BAM  -> [ BAM.baseName.split(/_Aligned.+/)[0], file(BAM) ] }
         .set { bam_ch }
 
     //Run CICERO on the STAR-aligner BAM files.

@@ -5,8 +5,8 @@ DATE=$(date +%F)
 NFX_CONFIG=./nextflow.config
 #Options: 'local_apptainer', 'PBS_apptainer', 'local_singularity', 'PBS_singularity'
 NFX_PROFILE='PBS_apptainer'
-#Options: 
-NFX_ENTRY=''
+#Options: star_index, fusion_calls
+NFX_ENTRY='star_index'
 #The output prefix on filenames for reports/logs
 REPORT=${1:-"pipeline_report"}
 

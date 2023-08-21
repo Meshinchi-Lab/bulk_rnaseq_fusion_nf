@@ -19,8 +19,7 @@ process fastqc {
     script:
     """
     mkdir fastqc_${Sample}_logs
-    fastqc -o fastqc_${Sample}_logs -t 6 -f fastq -q $R1 $R2
-    #rm $R1 $R2 to avoid repetitive upload to the S3 bucket
+    fastqc -o fastqc_${Sample}_logs -t ${task.cpus} -f fastq -q $R1 $R2
     """
 }
 
@@ -30,7 +29,7 @@ process fastqc {
 // mode:'copy'
 process multiqc {
 
-    publishDir "$params.multiQC"
+    // publishDir "$params.multiQC"
 
     //use image on quay.io
     container "quay.io/lifebitai/multiqc:latest"
@@ -59,11 +58,10 @@ process multiqc {
 //Run star-fusion on all fastq pairs and save output with the sample ID
 process STAR_Fusion {
 
-	publishDir "$params.STAR_Fusion_out/"
+	// publishDir "$params.STAR_Fusion_out/"
 
 	// use TrinityCTAT image repo on Quay.io from Biocontainers
 	container "quay.io/biocontainers/star-fusion:1.9.1--0"
-	label 'star_increasing_mem'
 
 	// declare the input types and its variable names
 	input:
@@ -93,7 +91,7 @@ process STAR_Fusion {
 
 	STAR --runMode alignReads \
     	--genomeDir \$PWD/$genome_lib/ref_genome.fa.star.idx \
-		--runThreadN 8 \
+		--runThreadN ${task.cpus} \
 		--readFilesIn $R1 $R2 \
 		--outFileNamePrefix $Sample \
 		--outReadsUnmapped None \
@@ -124,7 +122,7 @@ process STAR_Fusion {
 	  	--chimeric_junction "${Sample}Chimeric.out.junction" \
 		--left_fq $R1 \
 		--right_fq $R2 \
-	  	--CPU 8 \
+	  	--CPU ${task.cpus} \
 	  	--FusionInspector inspect \
 	  	--examine_coding_effect \
 	  	--denovo_reconstruct \
@@ -137,7 +135,7 @@ process STAR_Fusion {
 //build a CTAT resource library for STAR-Fusion use.
 process build_genome_refs {
 
-	publishDir "$params.Reference_Data/"
+	// publishDir "$params.Reference_Data/"
 
 	// use TrinityCTAT image from biocontainers
 	container "quay.io/biocontainers/star-fusion:1.9.1--0"
@@ -172,12 +170,10 @@ process build_genome_refs {
 
 //Build GRCh37-lite index for CICERO 
 process STAR_index {
-	publishDir "$params.star_index_out"
+	// publishDir "$params.star_index_out"
 
 	// use person
 	container "quay.io/jennylsmith/starfusion:1.8.1"
-	cpus 16
-	memory "315 GB"
 
 	// if process fails, retry running it
 	errorStrategy "retry"
@@ -197,7 +193,7 @@ process STAR_index {
 	set -eou 
 
 	mkdir \$PWD/GenomeDir
-	STAR --runThreadN 16 \
+	STAR --runThreadN ${task.cpus} \
 		--runMode genomeGenerate \
 		--genomeDir \$PWD/GenomeDir \
 		--genomeFastaFiles $fasta \
@@ -206,7 +202,7 @@ process STAR_index {
 }
 
 process STAR_aligner {
-	publishDir "$params.STAR_aligner_out/"
+	// publishDir "$params.STAR_aligner_out/"
 
 	// use TrinityCTAT image repo on Quay.io from Biocontainers
 	container "quay.io/biocontainers/star-fusion:1.9.1--0"
@@ -230,7 +226,7 @@ process STAR_aligner {
 
 	STAR --runMode alignReads \
     	--genomeDir  \$PWD/$star_index_out \
-		--runThreadN 8 \
+		--runThreadN ${task.cpus} \
 		--readFilesIn $R1 $R2 \
 		--outFileNamePrefix ${Sample} \
 		--outReadsUnmapped None \
@@ -246,7 +242,7 @@ process STAR_aligner {
 //Run CICERO fusion detection on all bam files and save output with the sample ID
 process CICERO {
 
-	publishDir "$params.CICERO_out"
+	// publishDir "$params.CICERO_out"
 
 	// use CICERO repo on docker hub.
 	container "quay.io/jennylsmith/cicero:df59166"
@@ -307,7 +303,7 @@ process unzip {
 //Run tin.py for QC check on all BAM files and save output with the sample ID
 process tin_scores {
 
-	publishDir "$params.tin_scores/"
+	// publishDir "$params.tin_scores/"
 
 	// use Bioconainers repo on quay.io.
 	container "quay.io/biocontainers/rseqc:4.0.0--py39h38f01e4_1"
