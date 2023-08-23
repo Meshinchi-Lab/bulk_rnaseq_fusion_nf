@@ -6,6 +6,8 @@
 test_data/
 resources/
 results/
+dag/
+reports/
 *.bak
 separate_modules.sh
 

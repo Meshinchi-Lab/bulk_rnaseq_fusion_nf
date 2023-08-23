@@ -4,9 +4,9 @@ nextflow.enable.dsl=2
 log.info """\
          R N A S E Q - F U S I O N  P I P E L I N E
          ===================================
-         transcriptome: ${params.star_genome_lib}
-         transcriptome: ${params.cicero_genome_lib}
-         samples      : ${params.sample_sheet}
+         star_refs      :   ${params.star_genome_lib}
+         cicero_refs    :   ${params.cicero_genome_lib}
+         samples        :   ${params.sample_sheet}
          """
          .stripIndent()
 
