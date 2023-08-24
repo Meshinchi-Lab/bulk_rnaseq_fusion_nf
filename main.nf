@@ -18,7 +18,9 @@ include {
         MD5sums as md5_star
         MD5sums as md5_cicero } from './modules/local/fusion-processes.nf'
 include { SAMTOOLS_INDEX } from './modules/nf-core/samtools/index/main'
-include { STAR_Fusion; 
+include { 
+        STAR_Prep_Fusion;
+        STAR_Fusion; 
         fastqc; 
         multiqc; 
         STAR_index; 
@@ -93,8 +95,9 @@ workflow  fusion_calls {
     Channel.fromPath(file(params.star_genome_lib, checkIfExists: true))
         .collect()
         .set { star_genome_lib }
-    STAR_Fusion(star_genome_lib, fqs_ch)
-    md5_star(STAR_Fusion.out.bam)
+    STAR_Prep_Fusion(star_genome_lib, fqs_ch)
+    STAR_Fusion(star_genome_lib, fqs_ch, STAR_Prep_Fusion.out.chimera)
+    md5_star(STAR_Prep_Fusion.out.bam)
 
     //CICERO requires GRCh37-lite aligned BAMs, so dependent on STAR-aligner BAM 
     Channel.fromPath(file(params.star_index_out, checkIfExists: true))

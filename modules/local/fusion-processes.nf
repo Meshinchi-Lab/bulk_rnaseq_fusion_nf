@@ -53,12 +53,9 @@ process multiqc {
 
 
 //Run star-fusion on all fastq pairs and save output with the sample ID
-process STAR_Fusion {
-
-    // publishDir "$params.STAR_Fusion_out/"
+process STAR_Prep_Fusion {
 
     // use TrinityCTAT image repo on Quay.io from Biocontainers
-    // container "quay.io/biocontainers/star-fusion:1.9.1--0"
     container "quay.io/biocontainers/star-fusion:1.12.0--hdfd78af_1"
 
     // declare the input types and its variable names
@@ -70,10 +67,8 @@ process STAR_Fusion {
     output:
     tuple val(sample), path("*Aligned.sortedByCoord.out.bam")    , emit: bam
     path("*SJ.out.tab")                                          , emit: juncs
-    // path("*Log.final.out")                                       , emit: log
-    // path("*Chimeric.out.junction")                               , emit: chimera_juncs
-    // path("${sample}/*abridged.coding_effect.tsv")                , emit: fusions
-    // path("${sample}/FusionInspector-inspect"), optional true     , emit: inspector
+    path("*Log.final.out")                                       , emit: log
+    path("*Chimeric.out.junction")                               , emit: chimera
 
     script:
     """
@@ -89,10 +84,11 @@ process STAR_Fusion {
         --twopass1readsN -1 \
         --readFilesCommand "gunzip -c" \
         --outSAMunmapped Within \
+        --outSAMstrandField intronMotif \
         --outSAMtype BAM SortedByCoordinate \
         --outSAMattributes NH HI NM MD AS nM jM jI XS \
         --chimSegmentMin 12 \
-        --chimJunctionOverhangMin 12 \
+        --chimJunctionOverhangMin 8 \
         --chimOutJunctionFormat 1 \
         --alignSJDBoverhangMin 10 \
         --alignMatesGapMax 100000 \
@@ -105,20 +101,47 @@ process STAR_Fusion {
         --chimNonchimScoreDropMin 10 \
         --peOverlapNbasesMin 12 \
         --peOverlapMMp 0.1 \
+        --alignInsertionFlush Right \
+        --alignSplicedMateMapLminOverLmate 0 \
+        --alignSplicedMateMapLmin 30 \
         --chimFilter banGenomicN
-
-    STAR-Fusion --genome_lib_dir \$PWD/$genome_lib \
-        --chimeric_junction "${sample}Chimeric.out.junction" \
-        --left_fq $R1 \
-        --right_fq $R2 \
-        --CPU ${task.cpus} \
-        --FusionInspector inspect \
-        --examine_coding_effect \
-        --denovo_reconstruct \
-        --output_dir $sample
     """
 }
 
+//Run star-fusion on all fastq pairs and save output with the sample ID
+process STAR_Fusion {
+    // use TrinityCTAT image repo on Quay.io from Biocontainers
+    container "quay.io/biocontainers/star-fusion:1.12.0--hdfd78af_1"
+
+    // declare the input types and its variable names
+    input:
+    path genome_lib
+    tuple val(sample), file(R1), file(R2)
+    path chimeric_juncs
+
+    //define output files to save to the output_folder by publishDir command
+    output:
+    path("${sample}/*abridged.coding_effect.tsv")   , emit: fusions
+    path("${sample}/FusionInspector-inspect")       , emit: inspector, optional: true
+
+    script:
+    """
+    set -eou pipefail
+
+    STAR-Fusion --genome_lib_dir \$PWD/$genome_lib \
+        --chimeric_junction "${chimeric_juncs}" \
+        --left_fq $R1 \
+        --right_fq $R2 \
+        --CPU ${task.cpus} \
+        --tmpdir "\$PWD" \
+        --extract_fusion_reads \
+        --FusionInspector inspect \
+        --examine_coding_effect \
+        --denovo_reconstruct \
+        --output_dir $sample \
+        --verbose_level 2
+    """
+}
 
 //build a CTAT resource library for STAR-Fusion use.
 process build_genome_refs {
@@ -245,22 +268,23 @@ process CICERO {
 
     //define output files to save to the output_folder by publishDir command
     output:
-    path "${sample}/CICERO_DATADIR/*/*.txt" optional true
-    
+    // path "${sample}/CICERO_DATADIR/*/*.txt" optional true
+    path("${sample}/*/*final_fusions.txt"), emit: cicero
+    path("${sample}/*/*.txt")
+    path("${sample}/*.log")
+
     script:
     def args = task.ext.args ?: ''
     // def prefix = task.ext.prefix ?: "${meta.id}"
     """
     set -eou pipefail
-
-    # index the bam file
-    #samtools index $BAM
+    export TMPDIR="\$PWD"
 
     # run CICERO fusion detection algorithm
     Cicero.sh -n ${task.cpus} \
-        -b $BAM \
+        -b \$PWD/$BAM \
         -g "GRCh37-lite" \
-        -r \$PWD/$cicero_genome_lib/ \
+        -r \$PWD/$cicero_genome_lib \
         -o ${sample}
     """
 }
