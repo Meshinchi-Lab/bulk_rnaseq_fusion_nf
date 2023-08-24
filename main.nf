@@ -14,12 +14,10 @@ log.info """\
 include {
         unzip as gunzip_fasta
         unzip as gunzip_gtf } from './modules/local/fusion-processes.nf'
-
 include {
         MD5sums as md5_star
         MD5sums as md5_cicero } from './modules/local/fusion-processes.nf'
-
-
+include { SAMTOOLS_INDEX } from './modules/nf-core/samtools/index/main'
 include { STAR_Fusion; 
         fastqc; 
         multiqc; 
@@ -97,21 +95,21 @@ workflow  fusion_calls {
         .set { star_genome_lib }
     STAR_Fusion(star_genome_lib, fqs_ch)
     md5_star(STAR_Fusion.out.bam)
-    
+
     //CICERO requires GRCh37-lite aligned BAMs, so dependent on STAR-aligner BAM 
     Channel.fromPath(file(params.star_index_out, checkIfExists: true))
         .collect()
         .set { star_index }
     STAR_aligner(star_index, fqs_ch)
-    STAR_aligner.out.BAM
-        .map { BAM  -> [ BAM.baseName.split(/_Aligned.+/)[0],
-                         file(BAM) ] 
-            }
-        .set { bam_ch }
+    SAMTOOLS_INDEX(STAR_aligner.out.bam)
+    md5_cicero(STAR_aligner.out.bam)
+    STAR_aligner.out.bam
+        .join(SAMTOOLS_INDEX.out.bai)
+        .set { bam_bai_ch }
 
     //Run CICERO on the STAR-aligner BAM files.
     Channel.fromPath(file(params.cicero_genome_lib, checkIfExists: true))
         .collect()
         .set { cicero_genome_lib }
-    CICERO(cicero_genome_lib, bam_ch)
+    CICERO(cicero_genome_lib, bam_bai_ch)
 }

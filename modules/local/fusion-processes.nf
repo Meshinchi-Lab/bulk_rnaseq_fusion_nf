@@ -68,12 +68,12 @@ process STAR_Fusion {
 
     //define output files to save to the output_folder by publishDir command
     output:
-    tuple val(sample), path("*Aligned.sortedByCoord.out.bam")   , emit: BAM
-    path "*SJ.out.tab",                                         , emit: juncs
-    path "*Log.final.out"                                       , emit: log
-    path "*Chimeric.out.junction"                               , emit: chimera_juncs
-    path "${sample}/*abridged.coding_effect.tsv"                , emit: fusions
-    path "${sample}/FusionInspector-inspect"                    , emit: inspector, optional true
+    tuple val(sample), path("*Aligned.sortedByCoord.out.bam")    , emit: bam
+    path("*SJ.out.tab")                                          , emit: juncs
+    // path("*Log.final.out")                                       , emit: log
+    // path("*Chimeric.out.junction")                               , emit: chimera_juncs
+    // path("${sample}/*abridged.coding_effect.tsv")                , emit: fusions
+    // path("${sample}/FusionInspector-inspect"), optional true     , emit: inspector
 
     script:
     """
@@ -200,9 +200,9 @@ process STAR_aligner {
     tuple val(sample), file(R1), file(R2)
 
     output:
-    path "*.bam"            , emit: BAM
-    path "*SJ.out.tab"      , emit: juncs
-    path "*Log.final.out"   , emit: log
+    tuple val(sample), path("*.bam")            , emit: bam
+    path "*SJ.out.tab"                          , emit: juncs
+    path "*Log.final.out"                       , emit: log
 
     script:
     def args = task.ext.args ?: ''
@@ -241,11 +241,11 @@ process CICERO {
     // declare the input types and its variable names
     input:
     path cicero_genome_lib
-    tuple val(sample), file(BAM)
+    tuple val(sample), file(BAM), file(BAI)
 
     //define output files to save to the output_folder by publishDir command
     output:
-    path "${Sample}/CICERO_DATADIR/*/*.txt" optional true
+    path "${sample}/CICERO_DATADIR/*/*.txt" optional true
     
     script:
     def args = task.ext.args ?: ''
@@ -254,7 +254,7 @@ process CICERO {
     set -eou pipefail
 
     # index the bam file
-    samtools index $BAM
+    #samtools index $BAM
 
     # run CICERO fusion detection algorithm
     Cicero.sh -n ${task.cpus} \
