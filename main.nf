@@ -15,6 +15,11 @@ include {
         unzip as gunzip_fasta
         unzip as gunzip_gtf } from './modules/local/fusion-processes.nf'
 
+include {
+        MD5sums as md5_star
+        MD5sums as md5_cicero } from './modules/local/fusion-processes.nf'
+
+
 include { STAR_Fusion; 
         fastqc; 
         multiqc; 
@@ -47,7 +52,7 @@ Required Arguments:
  """.stripIndent()
 }
 
-//Workflow to create an index for STAR-aligner given a human genome fasta and the URL location of the GTF file. 
+//Workflow to create an index for STAR-aligner given a human genome fasta and the location of the GTF file. 
 workflow star_index {
     //Download and stage the GTF file 
     Channel.fromPath(file(params.gtf, checkIfExists: true))
@@ -87,14 +92,26 @@ workflow  fusion_calls {
     multiqc(fastqc.out.collect(), sample_sheet.simpleName)
 
     //processes are treated like functions
-    STAR_Fusion(params.star_genome_lib, fqs_ch)
-
+    Channel.fromPath(file(params.star_genome_lib, checkIfExists: true))
+        .collect()
+        .set { star_genome_lib }
+    STAR_Fusion(star_genome_lib, fqs_ch)
+    md5_star(STAR_Fusion.out.bam)
+    
     //CICERO requires GRCh37-lite aligned BAMs, so dependent on STAR-aligner BAM 
-    STAR_aligner(params.star_index_out, fqs_ch)
+    Channel.fromPath(file(params.star_index_out, checkIfExists: true))
+        .collect()
+        .set { star_index }
+    STAR_aligner(star_index, fqs_ch)
     STAR_aligner.out.BAM
-        .map { BAM  -> [ BAM.baseName.split(/_Aligned.+/)[0], file(BAM) ] }
+        .map { BAM  -> [ BAM.baseName.split(/_Aligned.+/)[0],
+                         file(BAM) ] 
+            }
         .set { bam_ch }
 
     //Run CICERO on the STAR-aligner BAM files.
-    CICERO(params.cicero_genome_lib, bam_ch)
+    Channel.fromPath(file(params.cicero_genome_lib, checkIfExists: true))
+        .collect()
+        .set { cicero_genome_lib }
+    CICERO(cicero_genome_lib, bam_ch)
 }
