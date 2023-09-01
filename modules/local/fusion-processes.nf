@@ -127,7 +127,7 @@ process STAR_Fusion {
     script:
     """
     set -eou pipefail
-
+    #--denovo_reconstruct
     STAR-Fusion --genome_lib_dir \$PWD/$genome_lib \
         --chimeric_junction "${chimeric_juncs}" \
         --left_fq $R1 \
@@ -137,7 +137,6 @@ process STAR_Fusion {
         --extract_fusion_reads \
         --FusionInspector inspect \
         --examine_coding_effect \
-        --denovo_reconstruct \
         --output_dir $sample \
         --verbose_level 2
     """
@@ -307,8 +306,7 @@ process unzip {
 //Create MD5sum checks for all files in the channel
 process MD5sums {
 
-    // use ubuntu repo on docker hub.
-    container "ubuntu:latest"
+    container "centos/centos:centos7"
 
     // if process fails, retry running it
     errorStrategy "retry"

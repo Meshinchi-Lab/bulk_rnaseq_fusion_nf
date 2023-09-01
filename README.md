@@ -72,7 +72,13 @@ This repo also provides a NF workflow for the [CICERO](https://github.com/stjude
 
 The genome references for CICERO can be found [here](https://www.bcgsc.ca/downloads/genomes/9606/hg19/1000genomes/bwa_ind/genome/GRCh37-lite.fa) and [here](https://doi.org/10.5281/zenodo.3817656).
 
+For [GRCh38 fasta](ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.15_GRCh38/seqs_for_alignment_pipelines.ucsc_ids/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.gz)
+
+https://www.encodeproject.org/files/GRCh38_no_alt_analysis_set_GCA_000001405.15/@@download/GRCh38_no_alt_analysis_set_GCA_000001405.15.fasta.gz
+
+
 Docker Image: https://hub.docker.com/repository/docker/jennylsmith/cicero 
+
 
 ## Quality Control 
 
