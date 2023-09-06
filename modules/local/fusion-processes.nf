@@ -16,7 +16,7 @@ process fastqc {
 
     script:
     """
-    #mkdir fastqc_${sample}
+    mkdir ${sample}
     fastqc -o ${sample} -t ${task.cpus} -f fastq -q $R1 $R2
     """
 }
@@ -142,7 +142,7 @@ process STAR_Fusion {
 process build_genome_refs {
 
     // use TrinityCTAT image from biocontainers
-    container "quay.io/biocontainers/star-fusion:1.9.1--0"
+    container "quay.io/biocontainers/star-fusion:1.12.0--hdfd78af_1"
     cpus 16
     memory "126 GB"
 
@@ -176,7 +176,7 @@ process build_genome_refs {
 process STAR_index {
 
     // use image on quay.io
-    container "quay.io/jennylsmith/starfusion:1.8.1"
+    container "quay.io/biocontainers/star-fusion:1.12.0--hdfd78af_1"
 
     // if process fails, retry running it
     errorStrategy "retry"
@@ -207,12 +207,12 @@ process STAR_index {
 process STAR_aligner {
 
     // use TrinityCTAT image repo on Quay.io from Biocontainers
-    container "quay.io/jennylsmith/starfusion:1.8.1"
+    container "quay.io/biocontainers/star-fusion:1.12.0--hdfd78af_1"
     label 'star_increasing_mem'
 
     input:
-    path star_index_out
     tuple val(sample), file(R1), file(R2)
+    path star_index_dir
 
     output:
     tuple val(sample), path("*.bam")            , emit: bam
@@ -227,7 +227,7 @@ process STAR_aligner {
     set -eou pipefail 
 
     STAR --runMode alignReads \
-        --genomeDir  "\$PWD/${star_index_out}/GenomeDir" \
+        --genomeDir  "\$PWD/${star_index_dir}" \
         --runThreadN ${task.cpus} \
         --readFilesIn $R1 $R2 \
         --outFileNamePrefix ${sample} \
@@ -244,12 +244,8 @@ process STAR_aligner {
 //Run CICERO fusion detection on all bam files and save output with the sample ID
 process CICERO {
 
-    // use CICERO repo on docker hub.
-    // container "quay.io/jennylsmith/cicero:df59166"
+    // use CICERO container from stjude
     container "ghcr.io/stjude/cicero:v1.9.6"
-
-    // if process fails, retry running it
-    errorStrategy "retry"
 
     // declare the input types and its variable names
     input:
@@ -257,12 +253,11 @@ process CICERO {
     path cicero_genome_lib
     val genome
 
-    //define output files to save to the output_folder by publishDir command
+    //define output files
     output:
-    // path "${sample}/CICERO_DATADIR/*/*.txt" optional true
-    path("${sample}/*/*final_fusions.txt"), emit: cicero
-    path("${sample}/*/*.txt")
-    path("${sample}/*.log")
+    path("${sample}/*/*final_fusions.txt")  , emit: cicero, optional: true
+    path("${sample}/*/*.txt")               , emit: outfiles
+    path("${sample}/*.log")                 , emit: logs
 
     script:
     def args = task.ext.args ?: ''
@@ -283,7 +278,7 @@ process CICERO {
 //Helper function to unzip files when needed 
 process unzip {
 
-  input:
+    input:
     path zipped_file  
 
     output:
@@ -299,9 +294,6 @@ process unzip {
 process MD5sums {
 
     container "centos/centos:centos7"
-
-    // if process fails, retry running it
-    errorStrategy "retry"
 
     // declare the input types and its variable names
     input:

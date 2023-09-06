@@ -32,19 +32,20 @@ Required Arguments:
   Input Data:
   --sample_sheet        Single file with the location of all input data. Must be formatted
                         as a CSV with columns: Sample,R1,R2
-  Reference Data:
+
+  Required Genomic Reference Arguments:
   --star_genome_lib     The location of the CTAT Resource Library for STAR-Fusion - See https://data.broadinstitute.org/Trinity/CTAT_RESOURCE_LIB/ for available ones
   --cicero_genome_lib   The location of the References for CICERO Fusion - See https://github.com/stjude/CICERO#reference for available references.
-  
+  --genome              The referenfence genome to be used by CICERO. A string value can be 'GRCh37-lite' or 'GRCh38_no_alt' only. 
+  --build_index         Whether to build STAR aligner index. Boolean true or false. 
+
   Optional Arguments:
-  --fasta_file          Location of directory which contains the reference genome fasta file (single file) for the optional STAR fusion index step
-  --gtf_url             URL of the gtf file for the optional STAR index step - for example on gencode FTP "ftp.ebi.ac.uk/pub/databases/gencode/"
+  --fasta_file          Location of directory which contains the reference genome fasta file. Required if build_index = true. 
+  --gtf                 URL or path of the gtf file for the optional STAR index. Required if build_index = true. 
   
   Output Locations:
-  --STAR_Fusion_out
-  --multiQC_out
-  --star_index_out
-  --STAR_aligner_out
+  --outdir              The location of the pipeline results files 
+  --star_index_dir      The location of the STAR index for running STAR aligner 
  """.stripIndent()
 }
 
@@ -84,6 +85,7 @@ workflow  fusion_calls {
             .collect()
             .set { star_index }
     }
+    star_index.view {" the index channel is $it"}
     STAR_aligner(star_index, fqs_ch)
     SAMTOOLS_INDEX(STAR_aligner.out.bam)
     md5_cicero(STAR_aligner.out.bam)
@@ -105,5 +107,4 @@ workflow  fusion_calls {
         .collect()
         .set { mqc_ch }
     multiqc(mqc_ch, sample_sheet)
-
 }
