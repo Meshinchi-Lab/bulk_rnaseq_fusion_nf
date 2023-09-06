@@ -1,44 +1,34 @@
 process CICERO {
 
-	publishDir "$params.CICERO_out"
+    // use CICERO container from stjude
+    container "ghcr.io/stjude/cicero:v1.9.6"
 
-	// use CICERO repo on docker hub.
-	container "quay.io/jennylsmith/cicero:df59166"
-	cpus 2
-	memory "16 GB"
+    // declare the input types and its variable names
+    input:
+    tuple val(sample), file(BAM), file(BAI)
+    path cicero_genome_lib
+    val genome
 
-	// if process fails, retry running it
-	errorStrategy "retry"
+    //define output files
+    output:
+    path("${sample}/*/*final_fusions.txt")  , emit: cicero, optional: true
+    path("${sample}/*/*.txt")               , emit: outfiles
+    path("${sample}/*.log")                 , emit: logs
 
-	// declare the input types and its variable names
-	input:
-	path cicero_genome_lib
-	tuple val(Sample), file(BAM)
+    script:
+    def args = task.ext.args ?: ''
+    // def prefix = task.ext.prefix ?: "${meta.id}"
+    """
+    set -eou pipefail
+    export TMPDIR="\$PWD"
 
-	//define output files to save to the output_folder by publishDir command
-	output:
-	path "${Sample}/CICERO_DATADIR/*/*.txt" optional true
-
- 	script:
-	"""
-	set -eou pipefail
-
-	#list all files in the container
-	echo  -------------
-	echo "the bam file is" $BAM
-	ls -alh
-	echo  -------------
-
-	#index the bam file
-	samtools index $BAM
-
-	#run CICERO fusion detection algorithm
-	Cicero.sh -n 2 -b $BAM -g "GRCh37-lite" \
-			-r \$PWD/$cicero_genome_lib/ \
-			-o ${Sample}
-
-	echo -----------------------------------------
-	echo "list all output files in sample directory"
-	ls -1d $Sample/CICERO_DATADIR/
-	"""
+    # CICERO fusion detection algorithm
+    Cicero.sh \\
+        -n ${task.cpus} \\
+        -b \$PWD/$BAM \\
+        -g ${genome} \\
+        -r \$PWD/$cicero_genome_lib \\
+        $args \\
+        -o ${sample}
+    """
 }

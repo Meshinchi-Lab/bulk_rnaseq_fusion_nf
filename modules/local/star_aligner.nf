@@ -1,37 +1,37 @@
 process STAR_ALIGNER {
-	publishDir "$params.STAR_ALIGNER_out/"
 
-	// use TrinityCTAT image repo on Quay.io from Biocontainers
-	container "quay.io/biocontainers/star-fusion:1.9.1--0"
-	label 'star_increasing_mem'
-	
-	input:
-	path star_index_out
-	tuple val(Sample), file(R1), file(R2)
+    // use TrinityCTAT image repo on Quay.io from Biocontainers
+    container "quay.io/biocontainers/star-fusion:1.12.0--hdfd78af_1"
+    label 'star_increasing_mem'
 
-	output:
-	path "*.bam", emit: BAM
-	path "*SJ.out.tab"
-	path "*Log.final.out"
+    input:
+    tuple val(sample), file(R1), file(R2)
+    path star_index_dir
 
-	script:
-	"""
-	set -eou pipefail 
+    output:
+    tuple val(sample), path("*.bam")            , emit: bam
+    path "*SJ.out.tab"                          , emit: juncs
+    path "*Log.final.out"                       , emit: log
 
-	genome_idx=\$(basename ${star_index_out})
-	echo \$genome_idx
+    script:
+    def args = task.ext.args ?: ''
+    // def prefix = task.ext.prefix ?: "${meta.id}"
+    // def seq_center      = seq_center ? "--outSAMattrRGline ID:$prefix 'CN:$seq_center' 'SM:$prefix' $seq_platform " : "--outSAMattrRGline ID:$prefix 'SM:$prefix' $seq_platform "
+    """
+    set -eou pipefail 
 
-	STAR --runMode alignReads \
-    	--genomeDir  \$PWD/$star_index_out \
-		--runThreadN 8 \
-		--readFilesIn $R1 $R2 \
-		--outFileNamePrefix ${Sample} \
-		--outReadsUnmapped None \
-		--twopassMode Basic \
-		--twopass1readsN -1 \
-		--readFilesCommand "gunzip -c" \
-		--outSAMunmapped Within \
-		--outSAMtype BAM \
-		--outSAMattributes NH HI NM MD AS nM jM jI XS 
-	"""
+    STAR --runMode alignReads \
+        --genomeDir  "\$PWD/${star_index_dir}" \
+        --runThreadN ${task.cpus} \
+        --readFilesIn $R1 $R2 \
+        --outFileNamePrefix ${sample} \
+        $args \\
+        --outReadsUnmapped None \
+        --twopassMode Basic \
+        --twopass1readsN -1 \
+        --readFilesCommand "gunzip -c" \
+        --outSAMunmapped Within \
+        --outSAMtype BAM SortedByCoordinate \
+        --outSAMattributes NH HI NM MD AS nM jM jI XS 
+    """
 }

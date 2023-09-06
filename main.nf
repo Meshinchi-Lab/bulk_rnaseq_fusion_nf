@@ -12,14 +12,14 @@ log.info """\
 
 include { star_index } from './subworkflows/local/star_index.nf'
 include {
-        MD5sums as md5_star
-        MD5sums as md5_cicero } from './modules/local/fusion-processes.nf'
+        MD5SUMS as md5_star
+        MD5SUMS as md5_cicero } from './modules/local/md5sums.nf'
 include { SAMTOOLS_INDEX } from './modules/nf-core/samtools/index/main'
+include { FASTQC } from './modules/local/fastqc.nf'
+include { MULTIQC } from './modules/local/multiqc.nf'
+include { STAR_FUSION } from './modules/local/star_fusion.nf'
 include { 
         STAR_Prep_Fusion;
-        STAR_Fusion; 
-        fastqc; 
-        multiqc; 
         STAR_aligner; 
         CICERO } from './modules/local/fusion-processes.nf'
 
@@ -27,7 +27,7 @@ include {
 def helpMessage() {
     log.info"""
 Usage:
-nextflow run jennylsmith/STAR-fusion-NF <ARGUMENTS>
+nextflow run RSC-RP/star_fusion_nf <ARGUMENTS>
   Required Arguments:
   --sample_sheet        Single file with the location of all input data. Must be formatted as a CSV with columns: Sample,R1,R2
   --project             Cybertron project code (eg 207f23bf-acb6-4835-8bfe-142436acb58c) for HPC.
@@ -61,14 +61,14 @@ workflow  fusion_calls {
         .set { fqs_ch }
 
     // QC on the fastq files
-    fastqc(fqs_ch)
+    FASTQC(fqs_ch)
 
     // Prepare chimeric junctions files and input into STAR-fusion
     Channel.fromPath(file(params.star_genome_lib, checkIfExists: true))
         .collect()
         .set { star_genome_lib }
     STAR_Prep_Fusion(star_genome_lib, fqs_ch)
-    STAR_Fusion(star_genome_lib, fqs_ch, STAR_Prep_Fusion.out.chimera)
+    STAR_FUSION(star_genome_lib, fqs_ch, STAR_Prep_Fusion.out.chimera)
     md5_star(STAR_Prep_Fusion.out.bam)
 
     // CICERO requires GRCh37-lite or GRCh38_no_alt aligned BAMs,
@@ -103,8 +103,11 @@ workflow  fusion_calls {
 
     // MultiQC 
     def sample_sheet = file(params.sample_sheet).simpleName
-    fastqc.out.fastqc
+    FASTQC.out.fastqc
+        // .concat(STAR_ALIGNER.out.log)
+        // .concat(STAR_PREP_FUSION.out.log)
         .collect()
         .set { mqc_ch }
-    multiqc(mqc_ch, sample_sheet)
+    mqc_ch.view {"the mqc channel is $it"}
+    MULTIQC(mqc_ch, sample_sheet)
 }

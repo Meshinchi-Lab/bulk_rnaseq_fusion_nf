@@ -1,26 +1,26 @@
 process MULTIQC {
 
-    publishDir "$params.multiQC"
-
     //use image on quay.io
-    container "quay.io/lifebitai/MULTIQC:latest"
-    cpus 2
-    memory "16 GB"
+    container "quay.io/biocontainers/multiqc:1.15--pyhdfd78af_0"
 
     // if process fails, retry running it
     errorStrategy "retry"
 
     input:
-    path "*"
+    path input
     val sample_sheet
 
     output:
-    path "${sample_sheet}_MULTIQC_report.html"
+    path("${sample_sheet}_multiqc_report.html")     , emit: report
+    path("*report_data")                            , emit: data, optional: true
 
     script:
+    def args = task.ext.args ?: ''
     """
     set -eou pipefail
-
-    MULTIQC -v --filename "${sample_sheet}_multiqc_report.html"  .
+    multiqc \\
+        $args \\
+        --filename "${sample_sheet}_multiqc_report.html" \\
+        \$PWD
     """
 }

@@ -1,33 +1,28 @@
 process STAR_INDEX {
-	publishDir "$params.star_index_out"
 
-	// use person
-	container "quay.io/jennylsmith/starfusion:1.8.1"
-	cpus 16
-	memory "315 GB"
+    // use image on quay.io
+    container "quay.io/biocontainers/star-fusion:1.12.0--hdfd78af_1"
 
-	// if process fails, retry running it
-	errorStrategy "retry"
+    //input genome fasta and gtf
+    input: 
+    path fasta
+    path gtf
+    
+    //output the index into a diretory, and the logfile
+    output:
+    path("GenomeDir"), emit: index
 
-	//input genome fasta and gtf
-	input: 
-	path fasta
-	path gtf
-	
-	//output the index into a diretory, and the logfile
-	output:
-	path "*/GenomeDir"
-	path "Log.out"
+    script:
+    def args = task.ext.args ?: ''
+    """
+    set -eou 
 
-	script:
-	"""
-	set -eou 
-
-	mkdir \$PWD/GenomeDir
-	STAR --runThreadN 16 \
-		--runMode genomeGenerate \
-		--genomeDir \$PWD/GenomeDir \
-		--genomeFastaFiles $fasta \
-		--sjdbGTFfile $gtf
-	"""
+    mkdir \$PWD/GenomeDir
+    STAR --runThreadN ${task.cpus} \\
+        --runMode genomeGenerate \\
+        $args \\
+        --genomeDir \$PWD/GenomeDir \\
+        --genomeFastaFiles $fasta \\
+        --sjdbGTFfile $gtf
+    """
 }

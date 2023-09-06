@@ -1,58 +1,53 @@
-// Run fastQC to check each input fastq for quality metrics
-// from nextflow training April 2020 at Fred Hutch, Seattle WA
-process fastqc {
+// // Run fastQC to check each input fastq for quality metrics
+// process fastqc {
 
-    //use image on quay.io
-    container "quay.io/biocontainers/fastqc:0.11.9--hdfd78af_1"
+//     //use image on quay.io
+//     container "quay.io/biocontainers/fastqc:0.11.9--hdfd78af_1"
 
-    input:
-    tuple val(sample), file(R1), file(R2)
+//     input:
+//     tuple val(sample), file(R1), file(R2)
 
-    output:
-    path "${sample}", emit: fastqc
+//     output:
+//     path "${sample}", emit: fastqc
 
-    script:
-    def args = task.ext.args ?: ''
-    """
-    set -eou pipefail
-    mkdir ${sample}
-    fastqc \\
-        --outdir ${sample} \\
-        --threads ${task.cpus} \\
-        $args \\
-        $R1 $R2
-    """
-}
+//     script:
+//     def args = task.ext.args ?: ''
+//     """
+//     set -eou pipefail
+//     mkdir ${sample}
+//     fastqc \\
+//         --outdir ${sample} \\
+//         --threads ${task.cpus} \\
+//         $args \\
+//         $R1 $R2
+//     """
+// }
 
 
-//Run multiQC to concatenate the results of the fastQC process
-process multiqc {
+// //Run multiQC to concatenate the results of the fastQC process
+// process multiqc {
 
-    //use image on quay.io
-    // container "quay.io/lifebitai/multiqc:latest"
-    container "quay.io/biocontainers/multiqc:1.15--pyhdfd78af_0"
+//     //use image on quay.io
+//     container "quay.io/biocontainers/multiqc:1.15--pyhdfd78af_0"
 
-    // if process fails, retry running it
-    errorStrategy "retry"
+//     input:
+//     path(input)
+//     val sample_sheet
 
-    input:
-    path "*"
-    val sample_sheet
+//     output:
+//     path("${sample_sheet}_multiqc_report.html")     , emit: report
+//     path("*report_data")                            , emit: data, optional: true
 
-    output:
-    path("${sample_sheet}_multiqc_report.html")     , emit: report
-    path("*report_data")                            , emit: data, optional: true
-
-    script:
-    def args = task.ext.args ?: ''
-    """
-    set -eou pipefail
-    multiqc \\
-        $args \\
-        --filename "${sample_sheet}_multiqc_report.html" \\
-        \$PWD
-    """
-}
+//     script:
+//     def args = task.ext.args ?: ''
+//     """
+//     set -eou pipefail
+//     multiqc \\
+//         $args \\
+//         --filename "${sample_sheet}_multiqc_report.html" \\
+//         \$PWD
+//     """
+// }
 
 
 //Run star-fusion on all fastq pairs and save output with the sample ID
@@ -113,38 +108,38 @@ process STAR_Prep_Fusion {
     """
 }
 
-//Run star-fusion on all fastq pairs and save output with the sample ID
-process STAR_Fusion {
-    // use TrinityCTAT image repo on Quay.io from Biocontainers
-    container "quay.io/biocontainers/star-fusion:1.12.0--hdfd78af_1"
+// //Run star-fusion on all fastq pairs and save output with the sample ID
+// process STAR_Fusion {
+//     // use TrinityCTAT image repo on Quay.io from Biocontainers
+//     container "quay.io/biocontainers/star-fusion:1.12.0--hdfd78af_1"
 
-    // declare the input types and its variable names
-    input:
-    path genome_lib
-    tuple val(sample), file(R1), file(R2)
-    path chimeric_juncs
+//     // declare the input types and its variable names
+//     input:
+//     path genome_lib
+//     tuple val(sample), file(R1), file(R2)
+//     path chimeric_juncs
 
-    //define output files to save to the output_folder by publishDir command
-    output:
-    path("${sample}/*abridged.coding_effect.tsv")   , emit: fusions
-    path("${sample}/FusionInspector-inspect")       , emit: inspector, optional: true
+//     //define output files to save to the output_folder by publishDir command
+//     output:
+//     path("${sample}/*abridged.coding_effect.tsv")   , emit: fusions
+//     path("${sample}/FusionInspector-inspect")       , emit: inspector, optional: true
 
-    script:
-    def args = task.ext.args ?: ''
-    """
-    set -eou pipefail
-    #--denovo_reconstruct
-    STAR-Fusion \\
-        --genome_lib_dir \$PWD/$genome_lib \\
-        --chimeric_junction "${chimeric_juncs}" \\
-        --left_fq $R1 \\
-        --right_fq $R2 \\
-        --CPU ${task.cpus} \\
-        $args \\
-        --tmpdir "\$PWD"
-        --output_dir ${sample}
-    """
-}
+//     script:
+//     def args = task.ext.args ?: ''
+//     """
+//     set -eou pipefail
+//     #--denovo_reconstruct
+//     STAR-Fusion \\
+//         --genome_lib_dir \$PWD/$genome_lib \\
+//         --chimeric_junction "${chimeric_juncs}" \\
+//         --left_fq $R1 \\
+//         --right_fq $R2 \\
+//         --CPU ${task.cpus} \\
+//         $args \\
+//         --tmpdir "\$PWD"
+//         --output_dir ${sample}
+//     """
+// }
 
 //build a CTAT resource library for STAR-Fusion use.
 process build_genome_refs {
@@ -187,8 +182,7 @@ process STAR_index {
     
     //output the index into a diretory, and the logfile
     output:
-    path "GenomeDir", emit: index
-    path "Log.out", emit: log
+    path("GenomeDir"), emit: index
 
     script:
     def args = task.ext.args ?: ''

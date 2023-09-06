@@ -13,7 +13,9 @@ The output files will be put into a directory that is named after the sample ID 
 
 The STAR-Fusion docker image can be updated easily by selecting the latest image from either 1) the CTAT [docker hub](https://hub.docker.com/r/trinityctat/starfusion) or [quay.io](quay.io). Then update the `fusion-processes.nf` with the appropriate image and tag. The containers utilized here were developed by `biocontainers` repository on quay.io, and images *must not* include `ENTRYPOINT` or it may cause errors when executed through AWS S3.  
 
-The pre-build STAR-Fusion genome references can be found [here](https://data.broadinstitute.org/Trinity/CTAT_RESOURCE_LIB/)
+The pre-build STAR-Fusion genome references can be found [here](https://data.broadinstitute.org/Trinity/CTAT_RESOURCE_LIB/). 
+
+STAR-fusion --denovo_reconstruct currently does not work. 
 
 # To Run
 
