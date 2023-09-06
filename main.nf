@@ -61,8 +61,6 @@ workflow  fusion_calls {
 
     // QC on the fastq files
     fastqc(fqs_ch)
-    sample_sheet=file(params.sample_sheet)
-    multiqc(fastqc.out.collect(), sample_sheet.simpleName)
 
     // Prepare chimeric junctions files and input into STAR-fusion
     Channel.fromPath(file(params.star_genome_lib, checkIfExists: true))
@@ -100,4 +98,12 @@ workflow  fusion_calls {
     Channel.value(params.genome)
         .set { genome }
     CICERO(bam_bai_ch, cicero_genome_lib, genome)
+
+    // MultiQC 
+    def sample_sheet = file(params.sample_sheet).simpleName
+    fastqc.out.fastqc
+        .collect()
+        .set { mqc_ch }
+    multiqc(mqc_ch, sample_sheet)
+
 }

@@ -9,15 +9,15 @@ process fastqc {
     errorStrategy "retry"
 
     input:
-    tuple val(Sample), file(R1), file(R2)
+    tuple val(sample), file(R1), file(R2)
 
     output:
-    path "fastqc_${Sample}_logs"
+    path "${sample}", emit: fastqc
 
     script:
     """
-    mkdir fastqc_${Sample}_logs
-    fastqc -o fastqc_${Sample}_logs -t ${task.cpus} -f fastq -q $R1 $R2
+    #mkdir fastqc_${sample}
+    fastqc -o ${sample} -t ${task.cpus} -f fastq -q $R1 $R2
     """
 }
 
