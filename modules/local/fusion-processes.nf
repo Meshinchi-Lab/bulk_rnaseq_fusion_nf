@@ -23,11 +23,7 @@ process fastqc {
 
 
 //Run multiQC to concatenate the results of the fastQC process
-// from nextflow training April 2020 at Fred Hutch, Seattle WA
-// mode:'copy'
 process multiqc {
-
-    // publishDir "$params.multiQC"
 
     //use image on quay.io
     // container "quay.io/lifebitai/multiqc:latest"
@@ -145,8 +141,6 @@ process STAR_Fusion {
 //build a CTAT resource library for STAR-Fusion use.
 process build_genome_refs {
 
-    // publishDir "$params.Reference_Data/"
-
     // use TrinityCTAT image from biocontainers
     container "quay.io/biocontainers/star-fusion:1.9.1--0"
     cpus 16
@@ -211,7 +205,6 @@ process STAR_index {
 }
 
 process STAR_aligner {
-    // publishDir "$params.STAR_aligner_out/"
 
     // use TrinityCTAT image repo on Quay.io from Biocontainers
     container "quay.io/jennylsmith/starfusion:1.8.1"
@@ -250,8 +243,6 @@ process STAR_aligner {
 
 //Run CICERO fusion detection on all bam files and save output with the sample ID
 process CICERO {
-
-    // publishDir "$params.CICERO_out"
 
     // use CICERO repo on docker hub.
     // container "quay.io/jennylsmith/cicero:df59166"
