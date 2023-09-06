@@ -5,9 +5,6 @@ process fastqc {
     //use image on quay.io
     container "quay.io/biocontainers/fastqc:0.11.9--hdfd78af_1"
 
-    // if process fails, retry running it
-    errorStrategy "retry"
-
     input:
     tuple val(sample), file(R1), file(R2)
 
@@ -15,9 +12,15 @@ process fastqc {
     path "${sample}", emit: fastqc
 
     script:
+    def args = task.ext.args ?: ''
     """
+    set -eou pipefail
     mkdir ${sample}
-    fastqc -o ${sample} -t ${task.cpus} -f fastq -q $R1 $R2
+    fastqc \\
+        --outdir ${sample} \\
+        --threads ${task.cpus} \\
+        $args \\
+        $R1 $R2
     """
 }
 
@@ -37,13 +40,17 @@ process multiqc {
     val sample_sheet
 
     output:
-    path "${sample_sheet}_multiqc_report.html"
+    path("${sample_sheet}_multiqc_report.html")     , emit: report
+    path("*report_data")                            , emit: data, optional: true
 
     script:
+    def args = task.ext.args ?: ''
     """
     set -eou pipefail
-
-    multiqc -v --filename "${sample_sheet}_multiqc_report.html"  .
+    multiqc \\
+        $args \\
+        --filename "${sample_sheet}_multiqc_report.html" \\
+        \$PWD
     """
 }
 
@@ -67,6 +74,7 @@ process STAR_Prep_Fusion {
     path("*Chimeric.out.junction")                               , emit: chimera
 
     script:
+    def args = task.ext.args ?: ''
     """
     set -eou pipefail
 
@@ -75,6 +83,7 @@ process STAR_Prep_Fusion {
         --runThreadN ${task.cpus} \
         --readFilesIn $R1 $R2 \
         --outFileNamePrefix "${sample}" \
+        $args \
         --outReadsUnmapped None \
         --twopassMode Basic \
         --twopass1readsN -1 \
@@ -121,20 +130,19 @@ process STAR_Fusion {
     path("${sample}/FusionInspector-inspect")       , emit: inspector, optional: true
 
     script:
+    def args = task.ext.args ?: ''
     """
     set -eou pipefail
     #--denovo_reconstruct
-    STAR-Fusion --genome_lib_dir \$PWD/$genome_lib \
-        --chimeric_junction "${chimeric_juncs}" \
-        --left_fq $R1 \
-        --right_fq $R2 \
-        --CPU ${task.cpus} \
-        --tmpdir "\$PWD" \
-        --extract_fusion_reads \
-        --FusionInspector inspect \
-        --examine_coding_effect \
-        --output_dir $sample \
-        --verbose_level 2
+    STAR-Fusion \\
+        --genome_lib_dir \$PWD/$genome_lib \\
+        --chimeric_junction "${chimeric_juncs}" \\
+        --left_fq $R1 \\
+        --right_fq $R2 \\
+        --CPU ${task.cpus} \\
+        $args \\
+        --tmpdir "\$PWD"
+        --output_dir ${sample}
     """
 }
 
@@ -143,11 +151,6 @@ process build_genome_refs {
 
     // use TrinityCTAT image from biocontainers
     container "quay.io/biocontainers/star-fusion:1.12.0--hdfd78af_1"
-    cpus 16
-    memory "126 GB"
-
-    // if process fails, retry running it
-    errorStrategy "retry"
 
     // declare the input types and its variable names
     input:
@@ -155,31 +158,27 @@ process build_genome_refs {
 
     //define output files to save to the output_folder by publishDir command
     output:
-    path "ctat_genome_lib_build_dir"
+    path("ctat_genome_lib_build_dir"), emit: genome_dir
 
-  script:
+    script:
+    def args = task.ext.args ?: ''
     """
     set -eou pipefail
-    prep_genome_lib.pl \
-            --genome_fa \$PWD/$GENOME \
-            --gtf \$PWD/$GTF \
-            --dfam_db $DFAM \
-            --pfam_db $PFAM \
-            --CPU 16
-
-    find . -name "ctat_genome_lib_build_dir" -type d
-
+    prep_genome_lib.pl \\
+            --genome_fa \$PWD/$GENOME \\
+            --gtf \$PWD/$GTF \\
+            --dfam_db $DFAM \\
+            --pfam_db $PFAM \\
+            $args \\
+            --CPU ${task.cpus}
     """
 }
 
-//Build GRCh37-lite index for CICERO 
+//Build GRCh37-lite or GRCh38_no_alt index for CICERO 
 process STAR_index {
 
     // use image on quay.io
     container "quay.io/biocontainers/star-fusion:1.12.0--hdfd78af_1"
-
-    // if process fails, retry running it
-    errorStrategy "retry"
 
     //input genome fasta and gtf
     input: 
@@ -192,14 +191,16 @@ process STAR_index {
     path "Log.out", emit: log
 
     script:
+    def args = task.ext.args ?: ''
     """
     set -eou 
 
     mkdir \$PWD/GenomeDir
-    STAR --runThreadN ${task.cpus} \
-        --runMode genomeGenerate \
-        --genomeDir \$PWD/GenomeDir \
-        --genomeFastaFiles $fasta \
+    STAR --runThreadN ${task.cpus} \\
+        --runMode genomeGenerate \\
+        $args \\
+        --genomeDir \$PWD/GenomeDir \\
+        --genomeFastaFiles $fasta \\
         --sjdbGTFfile $gtf
     """
 }
@@ -231,6 +232,7 @@ process STAR_aligner {
         --runThreadN ${task.cpus} \
         --readFilesIn $R1 $R2 \
         --outFileNamePrefix ${sample} \
+        $args \\
         --outReadsUnmapped None \
         --twopassMode Basic \
         --twopass1readsN -1 \
@@ -267,10 +269,12 @@ process CICERO {
     export TMPDIR="\$PWD"
 
     # CICERO fusion detection algorithm
-    Cicero.sh -n ${task.cpus} \
-        -b \$PWD/$BAM \
-        -g ${genome} \
-        -r \$PWD/$cicero_genome_lib \
+    Cicero.sh \\
+        -n ${task.cpus} \\
+        -b \$PWD/$BAM \\
+        -g ${genome} \\
+        -r \$PWD/$cicero_genome_lib \\
+        $args \\
         -o ${sample}
     """
 }
@@ -285,8 +289,9 @@ process unzip {
     path "*", emit: unzipped_file
 
     script:
+    def args = task.ext.args ?: ''
     """
-    gunzip -f $zipped_file 
+    gunzip $args -f $zipped_file 
     """
 }
 
@@ -304,9 +309,10 @@ process MD5sums {
     path "*.md5"
 
     script:
+    def args = task.ext.args ?: ''
     """
     set -eou pipefail
     echo "Creating MD5sum checks"
-    md5sum ${input} > ${input}.md5
+    md5sum $args ${input} > ${input}.md5
     """
 }

@@ -28,24 +28,24 @@ def helpMessage() {
     log.info"""
 Usage:
 nextflow run jennylsmith/STAR-fusion-NF <ARGUMENTS>
-Required Arguments:
-  Input Data:
-  --sample_sheet        Single file with the location of all input data. Must be formatted
-                        as a CSV with columns: Sample,R1,R2
+  Required Arguments:
+  --sample_sheet        Single file with the location of all input data. Must be formatted as a CSV with columns: Sample,R1,R2
+  --project             Cybertron project code (eg 207f23bf-acb6-4835-8bfe-142436acb58c) for HPC.
+  --queue               Cybertron PBS queue name (eg paidq) for HPC.
 
   Required Genomic Reference Arguments:
   --star_genome_lib     The location of the CTAT Resource Library for STAR-Fusion - See https://data.broadinstitute.org/Trinity/CTAT_RESOURCE_LIB/ for available ones
   --cicero_genome_lib   The location of the References for CICERO Fusion - See https://github.com/stjude/CICERO#reference for available references.
   --genome              The referenfence genome to be used by CICERO. A string value can be 'GRCh37-lite' or 'GRCh38_no_alt' only. 
   --build_index         Whether to build STAR aligner index. Boolean true or false. 
+  --star_index_dir      The location of the STAR index for running STAR aligner. Can exist already or it will be created when build_index = true.
 
   Optional Arguments:
   --fasta_file          Location of directory which contains the reference genome fasta file. Required if build_index = true. 
   --gtf                 URL or path of the gtf file for the optional STAR index. Required if build_index = true. 
   
   Output Locations:
-  --outdir              The location of the pipeline results files 
-  --star_index_dir      The location of the STAR index for running STAR aligner 
+  --outdir              The location of the pipeline results files.
  """.stripIndent()
 }
 
