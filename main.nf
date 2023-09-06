@@ -10,10 +10,7 @@ log.info """\
          """
          .stripIndent()
 
-
-include {
-        unzip as gunzip_fasta
-        unzip as gunzip_gtf } from './modules/local/fusion-processes.nf'
+include { star_index } from './subworkflows/local/star_index.nf'
 include {
         MD5sums as md5_star
         MD5sums as md5_cicero } from './modules/local/fusion-processes.nf'
@@ -23,7 +20,6 @@ include {
         STAR_Fusion; 
         fastqc; 
         multiqc; 
-        STAR_index; 
         STAR_aligner; 
         CICERO } from './modules/local/fusion-processes.nf'
 
@@ -52,32 +48,9 @@ Required Arguments:
  """.stripIndent()
 }
 
-//Workflow to create an index for STAR-aligner given a human genome fasta and the location of the GTF file. 
-workflow star_index {
-    //Download and stage the GTF file 
-    Channel.fromPath(file(params.gtf, checkIfExists: true))
-        .set{ gtf }
-     //if gtf is gzipped, it must be decompressed   
-    if(params.gtf.endsWith(".gz")){
-        gunzip_gtf(gtf)
-        gunzip_gtf.out.unzipped_file
-            .set{ gtf }
-    } 
-    //Stage the genome fasta files for the index building step
-    Channel.fromPath(file(params.fasta_file, checkIfExists: true))
-        .set{ fasta }
-    // if fasta  is gzipped, it must be decompressed   
-    if(params.fasta_file.endsWith(".gz")){
-        gunzip_fasta(fasta)
-        gunzip_fasta.out.unzipped_file.set{fasta}
-    }
-    //Call STAR genomeGenerate to build the index
-    STAR_index(fasta, gtf)
-}
-
 workflow  fusion_calls {
     // Define the input paired fastq files in a sample sheet and genome references.
-    //The sample_sheet is comma separated with column names "Sample","R1","R2"
+    // The sample_sheet is comma separated with column names "Sample","R1","R2"
     Channel.fromPath(file(params.sample_sheet))
         .splitCsv(header: true, sep: ',')
         .map { sample -> [ sample["Sample"] + "_", 
@@ -86,12 +59,12 @@ workflow  fusion_calls {
             }
         .set { fqs_ch }
 
-    //run QC on the fastq files
+    // QC on the fastq files
     fastqc(fqs_ch)
     sample_sheet=file(params.sample_sheet)
     multiqc(fastqc.out.collect(), sample_sheet.simpleName)
 
-    //processes are treated like functions
+    // Prepare chimeric junctions files and input into STAR-fusion
     Channel.fromPath(file(params.star_genome_lib, checkIfExists: true))
         .collect()
         .set { star_genome_lib }
@@ -99,10 +72,20 @@ workflow  fusion_calls {
     STAR_Fusion(star_genome_lib, fqs_ch, STAR_Prep_Fusion.out.chimera)
     md5_star(STAR_Prep_Fusion.out.bam)
 
-    //CICERO requires GRCh37-lite aligned BAMs, so dependent on STAR-aligner BAM 
-    Channel.fromPath(file(params.star_index_out, checkIfExists: true))
-        .collect()
-        .set { star_index }
+    // CICERO requires GRCh37-lite or GRCh38_no_alt aligned BAMs,
+    // STAR-aligner must be re-run on these specific assemblies 
+    if ( params.build_index ) {
+        // optionally, build the index from fasta and gtf
+        star_index()
+        star_index.out.index
+            .collect()
+            .set { star_index }
+    } else {
+        // Stage the index files
+        Channel.fromPath(file(params.star_index_out, checkIfExists: true))
+            .collect()
+            .set { star_index }
+    }
     STAR_aligner(star_index, fqs_ch)
     SAMTOOLS_INDEX(STAR_aligner.out.bam)
     md5_cicero(STAR_aligner.out.bam)
@@ -110,9 +93,11 @@ workflow  fusion_calls {
         .join(SAMTOOLS_INDEX.out.bai)
         .set { bam_bai_ch }
 
-    //Run CICERO on the STAR-aligner BAM files.
+    // Run CICERO on the STAR-aligned BAM files.
     Channel.fromPath(file(params.cicero_genome_lib, checkIfExists: true))
         .collect()
         .set { cicero_genome_lib }
-    CICERO(cicero_genome_lib, bam_bai_ch)
+    Channel.value(params.genome)
+        .set { genome }
+    CICERO(bam_bai_ch, cicero_genome_lib, genome)
 }

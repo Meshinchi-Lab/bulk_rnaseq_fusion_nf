@@ -194,8 +194,8 @@ process STAR_index {
     
     //output the index into a diretory, and the logfile
     output:
-    path "GenomeDir"
-    path "Log.out"
+    path "GenomeDir", emit: index
+    path "Log.out", emit: log
 
     script:
     """
@@ -254,16 +254,17 @@ process CICERO {
     // publishDir "$params.CICERO_out"
 
     // use CICERO repo on docker hub.
-    container "quay.io/jennylsmith/cicero:df59166"
-    // container "ghcr.io/stjude/cicero:v1.9.6"
+    // container "quay.io/jennylsmith/cicero:df59166"
+    container "ghcr.io/stjude/cicero:v1.9.6"
 
     // if process fails, retry running it
     errorStrategy "retry"
 
     // declare the input types and its variable names
     input:
-    path cicero_genome_lib
     tuple val(sample), file(BAM), file(BAI)
+    path cicero_genome_lib
+    val genome
 
     //define output files to save to the output_folder by publishDir command
     output:
@@ -279,10 +280,10 @@ process CICERO {
     set -eou pipefail
     export TMPDIR="\$PWD"
 
-    # run CICERO fusion detection algorithm
+    # CICERO fusion detection algorithm
     Cicero.sh -n ${task.cpus} \
         -b \$PWD/$BAM \
-        -g "GRCh37-lite" \
+        -g ${genome} \
         -r \$PWD/$cicero_genome_lib \
         -o ${sample}
     """
