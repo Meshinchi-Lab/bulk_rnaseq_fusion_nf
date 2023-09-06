@@ -4,6 +4,7 @@ resources/
 results/
 dag/
 reports/
+CICERO/
 *.bak
 separate_modules.sh
 
