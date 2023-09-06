@@ -15,6 +15,8 @@ The STAR-Fusion docker image can be updated easily by selecting the latest image
 
 The pre-build STAR-Fusion genome references can be found [here](https://data.broadinstitute.org/Trinity/CTAT_RESOURCE_LIB/). 
 
+If a new fusion resource library must be created, for example for a non-human species, there is detailed documentation available [here](https://github.com/NCIP/ctat-genome-lib-builder/wiki).
+
 STAR-fusion --denovo_reconstruct currently does not work. 
 
 # To Run

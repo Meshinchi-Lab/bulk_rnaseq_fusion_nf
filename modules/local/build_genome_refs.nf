@@ -22,5 +22,6 @@ process BUILD_GENOME_REFS {
             --pfam_db $PFAM \\
             $args \\
             --CPU ${task.cpus}
+            --outTmpDir \$PWD
     """
 }

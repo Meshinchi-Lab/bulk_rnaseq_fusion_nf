@@ -10,8 +10,11 @@ process STAR_FUSION {
 
     //define output files to save to the output_folder by publishDir command
     output:
-    path("${sample}/*abridged.tsv")   , emit: fusions
-    path("${sample}/FusionInspector-inspect")       , emit: inspector, optional: true
+    path("${sample}/*abridged.tsv")                 , emit: fusions
+    path("${sample}/*coding_effect.tsv")            , emit: coding_effect, optional: true
+    path("${sample}/fusion_evidence_reads_*.fq")    , emit: fastqs, optional: true
+    path("${sample}/FusionInspector.log")           , emit: log, optional: true
+    path("${sample}/FusionInspector-*")             , emit: inspector, optional: true
 
     script:
     def args = task.ext.args ?: ''

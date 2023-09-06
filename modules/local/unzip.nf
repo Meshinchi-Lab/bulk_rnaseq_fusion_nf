@@ -10,10 +10,10 @@ process UNZIP {
 
     script:
     def args = task.ext.args ?: ''
-    def file_ext = "${zipped_file.getClass()}"
+    def outfile = "${zipped_file.toString()}"
     // def outfile = "${zipped_file.take())}"
     """
-    echo "the outfile is $file_ext"
+    echo "the outfile is $outfile"
     gunzip $args -f $zipped_file 
     """
 }

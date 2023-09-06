@@ -10,18 +10,23 @@ log.info """\
          """
          .stripIndent()
 
+// Subworkflows
 include { star_index } from './subworkflows/local/star_index.nf'
+include { build_genome_lib } from './subworkflows/local/star_build_refs.nf'
+
+// QC modules
 include {
-        MD5SUMS as md5_star
+        MD5SUMS as md5_star;
         MD5SUMS as md5_cicero } from './modules/local/md5sums.nf'
 include { SAMTOOLS_INDEX } from './modules/nf-core/samtools/index/main'
 include { FASTQC } from './modules/local/fastqc.nf'
 include { MULTIQC } from './modules/local/multiqc.nf'
+
+// Fusion modules
 include { STAR_FUSION } from './modules/local/star_fusion.nf'
-include { 
-        STAR_Prep_Fusion;
-        STAR_aligner; 
-        CICERO } from './modules/local/fusion-processes.nf'
+include { STAR_PREP_FUSION } from './modules/local/star_prep_fusion.nf'
+include { STAR_ALIGNER } from './modules/local/star_aligner.nf'
+include { CICERO } from './modules/local/cicero.nf'
 
 // Function which prints help message text
 def helpMessage() {
@@ -63,17 +68,10 @@ workflow  fusion_calls {
     // QC on the fastq files
     FASTQC(fqs_ch)
 
-    // Prepare chimeric junctions files and input into STAR-fusion
-    Channel.fromPath(file(params.star_genome_lib, checkIfExists: true))
-        .collect()
-        .set { star_genome_lib }
-    STAR_Prep_Fusion(star_genome_lib, fqs_ch)
-    STAR_FUSION(star_genome_lib, fqs_ch, STAR_Prep_Fusion.out.chimera)
-    md5_star(STAR_Prep_Fusion.out.bam)
-
-    // CICERO requires GRCh37-lite or GRCh38_no_alt aligned BAMs,
-    // STAR-aligner must be re-run on these specific assemblies 
-    if ( params.build_index ) {
+    // Prepare STAR aligner index
+    def build_index = params.build_index.toBoolean()
+    def build_genome_lib = params.build_genome_library.toBoolean()
+    if ( build_index ) {
         // optionally, build the index from fasta and gtf
         star_index()
         star_index.out.index
@@ -81,15 +79,37 @@ workflow  fusion_calls {
             .set { star_index }
     } else {
         // Stage the index files
-        Channel.fromPath(file(params.star_index_out, checkIfExists: true))
+        Channel.fromPath(file(params.star_index_dir, checkIfExists: true))
             .collect()
             .set { star_index }
     }
     star_index.view {" the index channel is $it"}
-    STAR_aligner(star_index, fqs_ch)
-    SAMTOOLS_INDEX(STAR_aligner.out.bam)
-    md5_cicero(STAR_aligner.out.bam)
-    STAR_aligner.out.bam
+    // Optionally, Prepare STAR-fusion references
+    if ( build_genome_lib ){
+        if ( build_index ) {
+            build_genome_lib(star_index.out.fasta, star_index.out.gtf)
+        } else {
+            build_genome_lib(params.fasta_file, params.gtf)
+        }
+        build_genome_lib().out.genome_lib
+            .set { star_genome_lib }
+    } else {
+        Channel.fromPath(file(params.star_genome_lib, checkIfExists: true))
+            .collect()
+            .set { star_genome_lib }
+    }
+    // Prepare chimeric junctions files and input into STAR-fusion
+    STAR_PREP_FUSION(star_genome_lib, fqs_ch)
+    // Run STAR-fusion detection
+    STAR_FUSION(star_genome_lib, fqs_ch, STAR_PREP_FUSION.out.chimera)
+    md5_star(STAR_PREP_FUSION.out.bam)
+
+    // CICERO requires GRCh37-lite or GRCh38_no_alt aligned BAMs,
+    // STAR-aligner must be re-run on these specific assemblies 
+    STAR_ALIGNER(fqs_ch, star_index)
+    SAMTOOLS_INDEX(STAR_ALIGNER.out.bam)
+    md5_cicero(STAR_ALIGNER.out.bam)
+    STAR_ALIGNER.out.bam
         .join(SAMTOOLS_INDEX.out.bai)
         .set { bam_bai_ch }
 

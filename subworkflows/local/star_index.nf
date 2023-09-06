@@ -30,4 +30,6 @@ workflow star_index {
 
     emit:
     index           = STAR_INDEX.out.index
+    fasta           = fasta
+    gtf             = gtf
 }
