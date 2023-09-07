@@ -27,6 +27,7 @@ include { STAR_FUSION } from './modules/local/star_fusion.nf'
 include { STAR_PREP_FUSION } from './modules/local/star_prep_fusion.nf'
 include { STAR_ALIGNER } from './modules/local/star_aligner.nf'
 include { CICERO } from './modules/local/cicero.nf'
+include { ARRIBA } from './modules/nf-core/arriba/main.nf'
 
 // Function which prints help message text
 def helpMessage() {
@@ -111,6 +112,13 @@ workflow  fusion_calls {
     STAR_ALIGNER.out.bam
         .join(SAMTOOLS_INDEX.out.bai)
         .set { bam_bai_ch }
+
+    // Arriba 
+    STAR_PREP_FUSION.out.bam 
+        .map { sample, bam -> [ [ "id":sample ], bam ] }
+        .set { arriba_ch }
+    // ARRIBA(arriba_ch,)
+
 
     // Run CICERO on the STAR-aligned BAM files.
     Channel.fromPath(file(params.cicero_genome_lib, checkIfExists: true))
