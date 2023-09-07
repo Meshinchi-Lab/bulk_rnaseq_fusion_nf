@@ -11,10 +11,10 @@ process CICERO {
 
     //define output files
     output:
-    path("${prefix}/${sample}*.out/${sample}*final_fusions.txt")    , emit: cicero, optional: true
-    path("${prefix}/${sample}*.out/*.txt")             , emit: outfiles, type: 'file'
-    path("${prefix}/${sample}*.out/*.html")            , emit: html, type: 'file'
-    path("${prefix}/*.{err,log,out}")                  , emit: logs
+    path("${sample}*/${sample}*.out/${sample}*final_fusions.txt")    , emit: cicero, optional: true
+    path("${sample}*/${sample}*.out/*.txt")             , emit: outfiles, type: 'file'
+    // path("${sample}*/${sample}*.out/*.html")            , emit: html, type: 'file'
+    // path("${sample}*/*.{err,log,out}")                  , emit: logs
 
     script:
     def args = task.ext.args ?: ''
