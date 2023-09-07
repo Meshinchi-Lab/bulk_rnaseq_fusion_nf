@@ -11,9 +11,9 @@ process CICERO {
 
     //define output files
     output:
-    path("${sample}/*/*final_fusions.txt")  , emit: cicero, optional: true
-    path("${sample}/*/*.txt")               , emit: outfiles
-    path("${sample}/*.log")                 , emit: logs
+    path("${sample}*/*/${sample}*final_fusions.txt")    , emit: cicero, optional: true
+    path("${sample}*/*/*.txt")                          , emit: outfiles, type: 'file'
+    path("${sample}*/*.{err,log,out}")                  , emit: logs
 
     script:
     def args = task.ext.args ?: ''
@@ -23,7 +23,6 @@ process CICERO {
     set -eou pipefail
     export TMPDIR="\$PWD"
 
-    # CICERO fusion detection algorithm
     Cicero.sh \\
         -n ${task.cpus} \\
         -b \$PWD/$BAM \\

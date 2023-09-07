@@ -14,7 +14,7 @@ process STAR_FUSION {
     path("${sample}/*coding_effect.tsv")            , emit: coding_effect, optional: true
     path("${sample}/fusion_evidence_reads_*.fq")    , emit: fastqs, optional: true
     path("${sample}/FusionInspector.log")           , emit: log, optional: true
-    path("${sample}/FusionInspector-*")             , emit: inspector, optional: true
+    path("${sample}/FusionInspector-*")             , emit: inspector, optional: true, type: 'file'
 
     script:
     def args = task.ext.args ?: ''
