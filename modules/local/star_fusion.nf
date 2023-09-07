@@ -24,11 +24,11 @@ process STAR_FUSION {
     STAR-Fusion \\
         $args \\
         --genome_lib_dir \$PWD/$genome_lib \\
-        --chimeric_junction "${chimeric_juncs}" \\
+        --chimeric_junction ${chimeric_juncs} \\
         --left_fq $R1 \\
         --right_fq $R2 \\
         --CPU ${task.cpus} \\
-        --tmpdir "\$PWD" \\
+        --tmpdir \$PWD \\
         --output_dir ${prefix}
     """
 }

@@ -127,6 +127,5 @@ workflow  fusion_calls {
         .concat(STAR_PREP_FUSION.out.log)
         .collect()
         .set { mqc_ch }
-    mqc_ch.view {"the mqc channel is $it"}
     MULTIQC(mqc_ch, sample_sheet)
 }
