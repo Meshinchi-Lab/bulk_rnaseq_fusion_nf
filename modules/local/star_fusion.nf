@@ -29,6 +29,6 @@ process STAR_FUSION {
         --left_fq $R1 \\
         --right_fq $R2 \\
         --CPU ${task.cpus} \\
-        --output_dir ${prefix}
+        --output_dir ${sample}
     """
 }
