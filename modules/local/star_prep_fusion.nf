@@ -17,6 +17,7 @@ process STAR_PREP_FUSION {
 
     script:
     def args = task.ext.args ?: ''
+    def prefix = task.ext.prefix ?: "${sample}"
     """
     set -eou pipefail
 
@@ -24,7 +25,7 @@ process STAR_PREP_FUSION {
         --genomeDir "${genome_lib}/ref_genome.fa.star.idx" \
         --runThreadN ${task.cpus} \
         --readFilesIn $R1 $R2 \
-        --outFileNamePrefix "${sample}" \
+        --outFileNamePrefix "${prefix}" \
         $args \
         --outReadsUnmapped None \
         --twopassMode Basic \

@@ -2,7 +2,6 @@ process STAR_ALIGNER {
 
     // use TrinityCTAT image repo on Quay.io from Biocontainers
     container "quay.io/biocontainers/star-fusion:1.12.0--hdfd78af_1"
-    label 'star_increasing_mem'
 
     input:
     tuple val(sample), file(R1), file(R2)
@@ -15,6 +14,7 @@ process STAR_ALIGNER {
 
     script:
     def args = task.ext.args ?: ''
+    def prefix = task.ext.prefix ?: "${sample}"
     // def prefix = task.ext.prefix ?: "${meta.id}"
     // def seq_center      = seq_center ? "--outSAMattrRGline ID:$prefix 'CN:$seq_center' 'SM:$prefix' $seq_platform " : "--outSAMattrRGline ID:$prefix 'SM:$prefix' $seq_platform "
     """
@@ -24,7 +24,7 @@ process STAR_ALIGNER {
         --genomeDir  "\$PWD/${star_index_dir}" \
         --runThreadN ${task.cpus} \
         --readFilesIn $R1 $R2 \
-        --outFileNamePrefix ${sample} \
+        --outFileNamePrefix ${prefix} \
         $args \\
         --outReadsUnmapped None \
         --twopassMode Basic \

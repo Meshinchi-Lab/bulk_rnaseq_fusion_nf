@@ -17,6 +17,7 @@ process CICERO {
 
     script:
     def args = task.ext.args ?: ''
+    def prefix = task.ext.prefix ?: "${sample}"
     // def prefix = task.ext.prefix ?: "${meta.id}"
     """
     set -eou pipefail
@@ -29,6 +30,6 @@ process CICERO {
         -g ${genome} \\
         -r \$PWD/$cicero_genome_lib \\
         $args \\
-        -o ${sample}
+        -o ${prefix}
     """
 }

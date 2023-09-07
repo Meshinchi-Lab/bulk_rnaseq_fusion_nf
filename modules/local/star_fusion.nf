@@ -18,6 +18,7 @@ process STAR_FUSION {
 
     script:
     def args = task.ext.args ?: ''
+    def prefix = task.ext.prefix ?: "${sample}"
     """
     set -eou pipefail
     STAR-Fusion \\
@@ -28,6 +29,6 @@ process STAR_FUSION {
         --right_fq $R2 \\
         --CPU ${task.cpus} \\
         --tmpdir "\$PWD" \\
-        --output_dir ${sample}
+        --output_dir ${prefix}
     """
 }
