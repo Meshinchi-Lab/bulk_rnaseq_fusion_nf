@@ -83,7 +83,6 @@ workflow  fusion_calls {
             .collect()
             .set { star_index }
     }
-    star_index.view {" the index channel is $it"}
     // Optionally, Prepare STAR-fusion references
     if ( build_genome_lib ){
         if ( build_index ) {
@@ -124,8 +123,8 @@ workflow  fusion_calls {
     // MultiQC 
     def sample_sheet = file(params.sample_sheet).simpleName
     FASTQC.out.fastqc
-        // .concat(STAR_ALIGNER.out.log)
-        // .concat(STAR_PREP_FUSION.out.log)
+        .concat(STAR_ALIGNER.out.log)
+        .concat(STAR_PREP_FUSION.out.log)
         .collect()
         .set { mqc_ch }
     mqc_ch.view {"the mqc channel is $it"}
