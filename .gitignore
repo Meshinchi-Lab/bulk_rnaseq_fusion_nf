@@ -5,6 +5,7 @@ results/
 dag/
 reports/
 CICERO/
+fusion-processes.nf
 *.bak
 separate_modules.sh
 
