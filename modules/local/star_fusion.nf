@@ -21,6 +21,7 @@ process STAR_FUSION {
     def prefix = task.ext.prefix ?: "${sample}"
     """
     set -eou pipefail
+
     STAR-Fusion \\
         $args \\
         --genome_lib_dir \$PWD/$genome_lib \\
@@ -28,7 +29,6 @@ process STAR_FUSION {
         --left_fq $R1 \\
         --right_fq $R2 \\
         --CPU ${task.cpus} \\
-        --tmpdir \$PWD \\
         --output_dir ${prefix}
     """
 }
