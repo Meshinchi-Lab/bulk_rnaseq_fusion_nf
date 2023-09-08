@@ -14,7 +14,7 @@ process STAR_FUSION {
     path("${sample}/*coding_effect.tsv")                        , emit: coding_effect, optional: true
     path("${sample}/fusion_evidence_reads_*.fq")                , emit: fastqs, optional: true
     path("${sample}/FusionInspector.log")                       , emit: log, optional: true
-    path("${sample}/FusionInspector-{inspect,validate}/*.*")    , emit: inspector, optional: true, type: 'file'
+    path("${sample}/FusionInspector-{inspect,validate}")        , emit: inspector, optional: true
 
     script:
     def args = task.ext.args ?: ''
@@ -23,13 +23,13 @@ process STAR_FUSION {
     set -eou pipefail
 
     STAR-Fusion \\
-        $args \\
         --genome_lib_dir \$PWD/$genome_lib \\
         --chimeric_junction ${chimeric_juncs} \\
         --left_fq $R1 \\
         --right_fq $R2 \\
         --CPU ${task.cpus} \\
         --output_dir ${sample} \\
+        $args \\
         --tmpdir \$PWD \\
         --outTmpDir \$PWD 
     """
