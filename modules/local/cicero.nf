@@ -12,7 +12,7 @@ process CICERO {
     //define output files
     output:
     path("${sample}/${sample}*.out/${sample}*final_fusions.txt")    , emit: cicero, optional: true
-    path("${sample}/${sample}*.out/")                               , emit: outfiles
+    path("${sample}/${sample}*.out")                                , emit: outfiles
     path("${sample}/*.{err,log,out}")                               , emit: logs
 
     script:
