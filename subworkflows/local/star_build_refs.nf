@@ -1,7 +1,7 @@
 include {
         UNZIP as gunzip_fasta;
         UNZIP as gunzip_gtf } from '../../modules/local/unzip.nf'
-include { BUILD_GENOME_REFS } from '../../modules/local/build_genome_refs.nf'
+include { BUILD_GENOME_REFS } from '../../modules/local/star/build_genome_refs.nf'
 
 //Workflow to create an index and fusion genome library for STAR-aligner given a genome fasta and the location of the GTF file. 
 workflow build_genome_lib {

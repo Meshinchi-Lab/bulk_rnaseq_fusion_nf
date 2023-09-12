@@ -1,7 +1,7 @@
 include {
         UNZIP as gunzip_fasta
         UNZIP as gunzip_gtf } from '../../modules/local/unzip.nf'
-include { STAR_INDEX } from '../../modules/local/star_index.nf'
+include { STAR_INDEX } from '../../modules/local/star/star_index.nf'
 
 //Workflow to create an index for STAR-aligner given a human genome fasta and the location of the GTF file. 
 workflow star_index {

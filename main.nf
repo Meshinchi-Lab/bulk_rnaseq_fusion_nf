@@ -23,10 +23,10 @@ include { FASTQC } from './modules/local/fastqc.nf'
 include { MULTIQC } from './modules/local/multiqc.nf'
 
 // Fusion modules
-include { STAR_FUSION } from './modules/local/star_fusion.nf'
-include { STAR_PREP_FUSION } from './modules/local/star_prep_fusion.nf'
-include { STAR_ALIGNER } from './modules/local/star_aligner.nf'
-include { CICERO } from './modules/local/cicero.nf'
+include { STAR_FUSION } from './modules/local/star/star_fusion.nf'
+include { STAR_PREP_FUSION } from './modules/local/star/star_prep_fusion.nf'
+include { STAR_ALIGNER } from './modules/local/star/star_aligner.nf'
+include { CICERO } from './modules/local/stjude/cicero.nf'
 include { ARRIBA } from './modules/nf-core/arriba/main.nf'
 
 // Function which prints help message text
