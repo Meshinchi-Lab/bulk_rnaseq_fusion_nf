@@ -11,8 +11,8 @@ process CICERO {
 
     //define output files
     output:
-    path("${sample}/${sample}*.out/*.{txt,tab,html}")               , emit: outfiles
-    path("${sample}/*.{err,log,out}")                               , emit: logs
+    path("${sample}/CICERO_DATADIR/${BAM.baseName}/*.txt")  , emit: outfiles
+    path("${sample}/*.{err,log,out}")                       , emit: logs
 
     script:
     def args = task.ext.args ?: ''
