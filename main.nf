@@ -100,15 +100,19 @@ workflow  fusion_calls {
     }
     // Prepare chimeric junctions files and input into STAR-fusion
     STAR_PREP_FUSION(star_genome_lib, fqs_ch)
-    // Run STAR-fusion detection
-    STAR_FUSION(star_genome_lib, fqs_ch, STAR_PREP_FUSION.out.chimera)
     md5_star(STAR_PREP_FUSION.out.bam)
+    // Run STAR-fusion detection
+    fqs_ch
+        .join(STAR_PREP_FUSION.out.chimera)
+        .set { star_fusion_ch }
+    // star_fusion_ch.view { "the channel is $it" }
+    STAR_FUSION(star_fusion_ch, star_genome_lib)
 
     // CICERO requires GRCh37-lite or GRCh38_no_alt aligned BAMs,
     // STAR-aligner must be re-run on these specific assemblies 
     STAR_ALIGNER(fqs_ch, star_index)
-    SAMTOOLS_INDEX(STAR_ALIGNER.out.bam)
     md5_cicero(STAR_ALIGNER.out.bam)
+    SAMTOOLS_INDEX(STAR_ALIGNER.out.bam)
     STAR_ALIGNER.out.bam
         .join(SAMTOOLS_INDEX.out.bai)
         .set { bam_bai_ch }

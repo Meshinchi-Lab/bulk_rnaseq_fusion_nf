@@ -6,14 +6,14 @@ process STAR_PREP_FUSION {
     // declare the input types and its variable names
     input:
     path genome_lib
-    tuple val(sample), file(R1), file(R2)
+    tuple val(sample), path(R1), path(R2)
 
     //define output files to save to the output_folder by publishDir command
     output:
     tuple val(sample), path("*Aligned.sortedByCoord.out.bam")    , emit: bam
-    path("*SJ.out.tab")                                          , emit: juncs
+    tuple val(sample), path("*SJ.out.tab")                       , emit: juncs
+    tuple val(sample), path("*Chimeric.out.junction")            , emit: chimera
     path("*Log.final.out")                                       , emit: log
-    path("*Chimeric.out.junction")                               , emit: chimera
 
     script:
     def args = task.ext.args ?: ''

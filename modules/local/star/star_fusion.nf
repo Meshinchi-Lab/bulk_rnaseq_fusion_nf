@@ -5,9 +5,8 @@ process STAR_FUSION {
 
     // declare the input types and its variable names
     input:
+    tuple val(sample), path(R1), path(R2), path(chimeric_juncs)
     path genome_lib
-    tuple val(sample), file(R1), file(R2)
-    path chimeric_juncs
 
     //define output files to save to the output_folder by publishDir command
     output:
