@@ -2,34 +2,34 @@
 
 set -eu
 DATE=$(date +%F)
-NFX_CONFIG=./nextflow.config
-#Options: 'local_apptainer', 'PBS_apptainer', 'local_singularity', 'PBS_singularity'
-NFX_PROFILE='PBS_apptainer'
+NXF_CONFIG=./nextflow.config
+# Options: 
+NXF_PROFILE='hyperqueue'
 #Options: star_index, fusion_calls
 NFX_ENTRY='fusion_calls'
 #The output prefix on filenames for reports/logs
-REPORT=${1:-"pipeline_report"}
-
-# Load the modules 
-if [[ $NFX_PROFILE =~ "singularity" ]]
-then
-    module load singularity
-elif [[ $NFX_PROFILE =~ "apptainer" ]]
-then
-    module load apptainer
-fi
+REPORT=${1:-"starfusion_pipeline_report"}
 
 #More Info:
 #https://github.com/FusionInspector/FusionInspector/wiki/FusionInspector-Outputs-Described
+
+# Set Debug > 0 to increase verbosity in nextflow logs
+export NXF_DEBUG=2
+
+# Ensure nextflow home variable is on a shared file system
+# https://www.nextflow.io/docs/latest/reference/env-vars.html#nextflow-settings
+export NXF_HOME="$HOME/nextflow"
+mkdir -p $NXF_HOME
 
 # Execute the nextflow index workflow
 PREFIX=${REPORT}_${DATE}
 nextflow -c ${NFX_CONFIG}\
     -log reports/${PREFIX}_nextflow.log \
     run main.nf \
-    -entry ${NFX_ENTRY} \
-    -profile ${NFX_PROFILE} \
-    -with-report reports/${PREFIX}.html \
-    -with-dag dag/${PREFIX}_dag.pdf \
+    -e.NXF_HOME=$NXF_HOME \
     -cache TRUE \
-    -resume
+    -entry ${NXF_ENTRY} \
+    -profile ${NXF_PROFILE} \
+    -with-report reports/${PREFIX}.html \
+    -with-dag dag/${PREFIX}_dag.html \
+    -with-trace reports/${PREFIX}_trace.txt
