@@ -27,31 +27,27 @@ process STAR_PREP_FUSION {
         --readFilesIn $R1 $R2 \
         --outFileNamePrefix "${prefix}" \
         $args \
-        --outReadsUnmapped None \
         --twopassMode Basic \
         --twopass1readsN -1 \
-        --readFilesCommand "gunzip -c" \
         --outSAMunmapped Within \
-        --outSAMstrandField intronMotif \
-        --outSAMtype BAM SortedByCoordinate \
-        --outSAMattributes NH HI NM MD AS nM jM jI XS \
-        --chimSegmentMin 12 \
-        --chimJunctionOverhangMin 8 \
-        --chimOutJunctionFormat 1 \
         --alignSJDBoverhangMin 10 \
         --alignMatesGapMax 100000 \
         --alignIntronMax 100000 \
         --alignSJstitchMismatchNmax 5 -1 5 5 \
+        --alignInsertionFlush Right \
+        --alignSplicedMateMapLminOverLmate 0 \
+        --alignSplicedMateMapLmin 30 \
+
+        --chimSegmentMin 12 \
+        --chimJunctionOverhangMin 8 \
+        --chimOutJunctionFormat 1 \
         --outSAMattrRGline ID:GRPundef \
         --chimMultimapScoreRange 3 \
         --chimScoreJunctionNonGTAG -4 \
         --chimMultimapNmax 20 \
         --chimNonchimScoreDropMin 10 \
+        --chimFilter banGenomicN \
         --peOverlapNbasesMin 12 \
-        --peOverlapMMp 0.1 \
-        --alignInsertionFlush Right \
-        --alignSplicedMateMapLminOverLmate 0 \
-        --alignSplicedMateMapLmin 30 \
-        --chimFilter banGenomicN
+        --peOverlapMMp 0.1
     """
 }

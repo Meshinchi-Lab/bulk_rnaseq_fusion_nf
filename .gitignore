@@ -4,7 +4,7 @@ resources/
 results/
 dag/
 reports/
-
+**test_results/
 .vscode 
 
 # Nextflow Logs #

@@ -66,9 +66,6 @@ workflow  fusion_calls {
             }
         .set { fqs_ch }
 
-    // QC on the fastq files
-    FASTQC(fqs_ch)
-
     // Prepare STAR aligner index
     def build_index = params.build_index.toBoolean()
     def build_genome_lib = params.build_genome_library.toBoolean()
@@ -123,7 +120,6 @@ workflow  fusion_calls {
         .set { arriba_ch }
     // ARRIBA(arriba_ch,)
 
-
     // Run CICERO on the STAR-aligned BAM files.
     Channel.fromPath(file(params.cicero_genome_lib, checkIfExists: true))
         .collect()
@@ -132,12 +128,15 @@ workflow  fusion_calls {
         .set { genome }
     CICERO(bam_bai_ch, cicero_genome_lib, genome)
 
-    // MultiQC 
-    def sample_sheet = file(params.sample_sheet).simpleName
-    FASTQC.out.fastqc
-        .concat(STAR_ALIGNER.out.log)
-        .concat(STAR_PREP_FUSION.out.log)
-        .collect()
-        .set { mqc_ch }
-    MULTIQC(mqc_ch, sample_sheet)
+    // QC on the fastq files
+    if ( params.run_qc ) {
+        def sample_sheet = file(params.sample_sheet).simpleName
+        FASTQC(fqs_ch)
+        FASTQC.out.fastqc
+            .concat(STAR_ALIGNER.out.log)
+            .concat(STAR_PREP_FUSION.out.log)
+            .collect()
+            .set { mqc_ch }
+        MULTIQC(mqc_ch, sample_sheet)
+    }
 }
