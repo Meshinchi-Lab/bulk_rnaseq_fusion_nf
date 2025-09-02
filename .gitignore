@@ -5,6 +5,8 @@ results/
 dag/
 reports/
 
+.vscode 
+
 # Nextflow Logs #
 #################
 .nextflow/
@@ -12,11 +14,12 @@ reports/
 .command*
 nextflow_report*
 
-#Python notebooks
+#Python notebooks and env
 __pycache__/
 .ipynb_checkpoints/
 *.pyc
-
+venv/
+.venv/
 
 # Compiled source #
 ###################
