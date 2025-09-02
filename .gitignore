@@ -1,13 +1,16 @@
 # project specific
-test_data/
+data/
 resources/
 results/
 dag/
 reports/
-CICERO/
-fusion-processes.nf
-*.bak
-separate_modules.sh
+
+# Nextflow Logs #
+#################
+.nextflow/
+.nextflow.*
+.command*
+nextflow_report*
 
 #Python notebooks
 __pycache__/
@@ -54,13 +57,6 @@ __pycache__/
 ehthumbs.db
 Thumbs.db
 
-
-# Nextflow Logs #
-#################
-.nextflow/
-.nextflow.*
-.command*
-nextflow_report*
 
 # temporary directories #
 **/tmp/
