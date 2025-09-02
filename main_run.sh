@@ -6,7 +6,7 @@ NXF_CONFIG=./nextflow.config
 # Options: 
 NXF_PROFILE='hyperqueue'
 #Options: star_index, fusion_calls
-NFX_ENTRY='fusion_calls'
+NXF_ENTRY='fusion_calls'
 #The output prefix on filenames for reports/logs
 REPORT=${1:-"starfusion_pipeline_report"}
 
@@ -23,7 +23,7 @@ mkdir -p $NXF_HOME
 
 # Execute the nextflow index workflow
 PREFIX=${REPORT}_${DATE}
-nextflow -c ${NFX_CONFIG}\
+nextflow -c ${NXF_CONFIG}\
     -log reports/${PREFIX}_nextflow.log \
     run main.nf \
     -e.NXF_HOME=$NXF_HOME \
