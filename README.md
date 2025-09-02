@@ -7,11 +7,15 @@
   2. The location of the CTAT resource library
   3. The location of CICERO genome resource library
 
-The output of STAR aligner, [STAR-Fusion](https://github.com/STAR-Fusion/STAR-Fusion/wiki), and [Fusion-Inspector](https://github.com/FusionInspector/FusionInspector/wiki) will be uploaded to an S3 bucket. This includes the most relevant output files, such as SJ.out.tab, aligned.bam, and chimeric.junctions.tab, and the fusion inspector HTML report. In addition, the fastq files undergo quality control checks and a multiQC report is generated and uploaded an S3 bucket.  The workflow also includes the [CICERO](https://github.com/stjude/CICERO) fusion detection algorithm that is run using the aligned.bam from STAR-aligner output.  
+The output of STAR aligner, [STAR-Fusion](https://github.com/STAR-Fusion/STAR-Fusion/wiki), and [Fusion-Inspector](https://github.com/FusionInspector/FusionInspector/wiki) will be uploaded to an S3 bucket. This includes the most relevant output files, such as SJ.out.tab, aligned.bam, and chimeric.junctions.tab, and the fusion inspector HTML report. 
+
+The workflow also includes the [CICERO](https://github.com/stjude/CICERO) fusion detection algorithm that is run using the aligned.bam from STAR-aligner output.  In addition, the fastq files undergo quality control checks and a multiQC report is generated and uploaded an S3 bucket. 
 
 The output files will be put into a directory that is named after the sample ID provided in the sample sheet file.  
 
 The STAR-Fusion docker image can be updated easily by selecting the latest image from either 1) the CTAT [docker hub](https://hub.docker.com/r/trinityctat/starfusion) or [quay.io](quay.io). Then update the `fusion-processes.nf` with the appropriate image and tag.
+
+## Genome Reference Files 
 
 The pre-build STAR-Fusion genome references can be found [here](https://data.broadinstitute.org/Trinity/CTAT_RESOURCE_LIB/). 
 
@@ -20,14 +24,29 @@ If a new fusion resource library must be created, for example for a non-human sp
 [09/26/2023]
 STAR-fusion --denovo_reconstruct currently does not work. 
 
+This repo also provides a NF workflow for the [CICERO](https://github.com/stjude/CICERO) fusion detection algorithm. The genome references for CICERO can be found [here](https://www.bcgsc.ca/downloads/genomes/9606/hg19/1000genomes/bwa_ind/genome/GRCh37-lite.fa) and [here](https://doi.org/10.5281/zenodo.3817656).
+
+For [GRCh38 fasta](ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.15_GRCh38/seqs_for_alignment_pipelines.ucsc_ids/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.gz)
+
 # To Run
 
 ## Install Nextflow
 
-Install nextflow using the conda env yaml file.
+Install nextflow and nf-core using a python virtual environment
 
 ```
-conda env create -f env/nextflow.yaml
+python3 -m venv venv
+source venv/bin/activate
+python3 -m pip install -r requirements.txt 
+
+nextflow 
+nf-core
+```
+
+or install nextflow using the conda env yaml file.
+
+```
+conda env create -f nextflow.yaml
 ```
 
 ## First Step: Sample Sheet
@@ -81,10 +100,6 @@ conda activate nextflow
 ```
 
 # CICERO Fusion Detection
-
-This repo also provides a NF workflow for the [CICERO](https://github.com/stjude/CICERO) fusion detection algorithm. The genome references for CICERO can be found [here](https://www.bcgsc.ca/downloads/genomes/9606/hg19/1000genomes/bwa_ind/genome/GRCh37-lite.fa) and [here](https://doi.org/10.5281/zenodo.3817656).
-
-For [GRCh38 fasta](ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.15_GRCh38/seqs_for_alignment_pipelines.ucsc_ids/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.gz)
 
 
 ## Quality Control 
