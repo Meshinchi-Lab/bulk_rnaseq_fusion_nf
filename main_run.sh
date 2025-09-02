@@ -4,7 +4,7 @@ set -eu
 DATE=$(date +%F)
 NXF_CONFIG=./nextflow.config
 # Options: 
-NXF_PROFILE='hyperqueue'
+NXF_PROFILE='docker'
 #Options: star_index, fusion_calls
 NXF_ENTRY='fusion_calls'
 #The output prefix on filenames for reports/logs
