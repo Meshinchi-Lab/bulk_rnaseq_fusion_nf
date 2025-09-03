@@ -20,18 +20,15 @@ process STAR_ALIGNER {
     """
     set -eou pipefail 
 
-    STAR --runMode alignReads \
-        --genomeDir  "\$PWD/${star_index_dir}" \
-        --runThreadN ${task.cpus} \
-        --readFilesIn $R1 $R2 \
-        --outFileNamePrefix ${prefix} \
+    STAR --runMode alignReads \\
+        --genomeDir  \$PWD/${star_index_dir} \\
+        --runThreadN ${task.cpus} \\
+        --readFilesIn $R1 $R2 \\
+        --outFileNamePrefix ${prefix} \\
         $args \\
-        --outReadsUnmapped None \
-        --twopassMode Basic \
-        --twopass1readsN -1 \
-        --readFilesCommand "gunzip -c" \
-        --outSAMunmapped Within \
-        --outSAMtype BAM SortedByCoordinate \
-        --outSAMattributes NH HI NM MD AS nM jM jI XS 
+        --outReadsUnmapped None \\
+        --twopassMode Basic \\
+        --twopass1readsN -1 \\
+        --outReadsUnmapped None \\
     """
 }
