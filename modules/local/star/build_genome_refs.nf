@@ -1,7 +1,7 @@
 process BUILD_GENOME_REFS {
 
     // use TrinityCTAT image from biocontainers
-    container "quay.io/biocontainers/star-fusion:1.12.0--hdfd78af_1"
+    // container "quay.io/biocontainers/star-fusion:1.12.0--hdfd78af_1"
 
     // declare the input types and its variable names
     input:

@@ -1,6 +1,6 @@
 process STAR_FUSION {
     // use TrinityCTAT image repo on Quay.io from Biocontainers
-    container "quay.io/biocontainers/star-fusion:1.12.0--hdfd78af_1"
+    // container "quay.io/biocontainers/star-fusion:1.12.0--hdfd78af_1"
     // container "https://data.broadinstitute.org/Trinity/CTAT_SINGULARITY/STAR-Fusion/star-fusion.v1.12.0.simg"
 
     // declare the input types and its variable names

@@ -1,7 +1,7 @@
 process STAR_PREP_FUSION {
 
     // use TrinityCTAT image repo on Quay.io from Biocontainers
-    container "quay.io/biocontainers/star-fusion:1.12.0--hdfd78af_1"
+    // container "quay.io/biocontainers/star-fusion:1.15.1--hdfd78af_1"
 
     // declare the input types and its variable names
     input:
@@ -19,12 +19,10 @@ process STAR_PREP_FUSION {
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${sample}"
     """
-    set -eou pipefail
-
     STAR --runMode alignReads \
-        --genomeDir "${genome_lib}/ref_genome.fa.star.idx" \
+        --genomeDir ./${genome_lib}/ref_genome.fa.star.idx \
         --runThreadN ${task.cpus} \
-        --readFilesIn $R1 $R2 \
+        --readFilesIn ${R1} ${R2} \
         --outFileNamePrefix "${prefix}" \
         $args \
         --twopassMode Basic \

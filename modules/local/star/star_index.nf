@@ -1,7 +1,7 @@
 process STAR_INDEX {
 
     // use image on quay.io
-    container "quay.io/biocontainers/star-fusion:1.12.0--hdfd78af_1"
+    // container "quay.io/biocontainers/star-fusion:1.12.0--hdfd78af_1"
 
     //input genome fasta and gtf
     input: 

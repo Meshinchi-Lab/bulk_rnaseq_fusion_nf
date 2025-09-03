@@ -1,7 +1,7 @@
 process STAR_ALIGNER {
 
     // use TrinityCTAT image repo on Quay.io from Biocontainers
-    container "quay.io/biocontainers/star-fusion:1.12.0--hdfd78af_1"
+    // container "quay.io/biocontainers/star-fusion:1.12.0--hdfd78af_1"
 
     input:
     tuple val(sample), file(R1), file(R2)
