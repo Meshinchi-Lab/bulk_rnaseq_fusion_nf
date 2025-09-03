@@ -21,14 +21,13 @@ process STAR_ALIGNER {
     set -eou pipefail 
 
     STAR --runMode alignReads \\
-        --genomeDir  \$PWD/${star_index_dir} \\
+        --genomeDir  ./${star_index_dir} \\
         --runThreadN ${task.cpus} \\
         --readFilesIn $R1 $R2 \\
         --outFileNamePrefix ${prefix} \\
         $args \\
-        --outReadsUnmapped None \\
         --twopassMode Basic \\
         --twopass1readsN -1 \\
-        --outReadsUnmapped None \\
+        --outReadsUnmapped None
     """
 }
