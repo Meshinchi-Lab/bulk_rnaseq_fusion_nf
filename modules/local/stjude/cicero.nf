@@ -19,13 +19,13 @@ process CICERO {
     def prefix = task.ext.prefix ?: "${sample}"
     // def prefix = task.ext.prefix ?: "${meta.id}"
     """
-    set -eou pipefail
     export TMPDIR=\$PWD
+
     Cicero.sh \\
         -n ${task.cpus} \\
-        -b \$PWD/$BAM \\
+        -b $BAM \\
         -g ${genome} \\
-        -r \$PWD/$cicero_genome_lib \\
+        -r \${PWD}/$cicero_genome_lib \\
         $args \\
         -o ${sample}
     """

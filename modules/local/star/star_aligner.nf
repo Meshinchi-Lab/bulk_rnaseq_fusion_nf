@@ -18,8 +18,6 @@ process STAR_ALIGNER {
     // def prefix = task.ext.prefix ?: "${meta.id}"
     // def seq_center      = seq_center ? "--outSAMattrRGline ID:$prefix 'CN:$seq_center' 'SM:$prefix' $seq_platform " : "--outSAMattrRGline ID:$prefix 'SM:$prefix' $seq_platform "
     """
-    set -eou pipefail 
-
     STAR --runMode alignReads \\
         --genomeDir  ./${star_index_dir} \\
         --runThreadN ${task.cpus} \\
