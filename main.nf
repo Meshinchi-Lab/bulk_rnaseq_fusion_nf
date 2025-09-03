@@ -58,7 +58,7 @@ nextflow run RSC-RP/star_fusion_nf <ARGUMENTS>
 workflow  fusion_calls {
     // Define the input paired fastq files in a sample sheet and genome references.
     // The sample_sheet is comma separated with column names "Sample","R1","R2"
-    Channel.fromPath(file(params.sample_sheet))
+    Channel.fromPath(file(params.sample_sheet, checkIfExists: true))
         .splitCsv(header: true, sep: ',')
         .map { sample -> [ sample["Sample"] + "_", 
                            file(sample["R1"], checkIfExists: true), 
@@ -66,7 +66,7 @@ workflow  fusion_calls {
             }
         .set { fqs_ch }
 
-    // Prepare STAR aligner index
+    // Prepare STAR aligner index for input BAM to CICERO 
     def build_index = params.build_index.toBoolean()
     def build_genome_lib = params.build_genome_library.toBoolean()
     if ( build_index ) {
@@ -81,7 +81,8 @@ workflow  fusion_calls {
             .collect()
             .set { star_index }
     }
-    // Optionally, Prepare STAR-fusion references
+
+    // Optionally, Build STAR-fusion references
     if ( build_genome_lib ){
         if ( build_index ) {
             build_genome_lib(star_index.out.fasta, star_index.out.gtf)
@@ -91,6 +92,7 @@ workflow  fusion_calls {
         build_genome_lib().out.genome_lib
             .set { star_genome_lib }
     } else {
+        // Use the STAR index files provided in the downloaded plug-n-play refs
         Channel.fromPath(file(params.star_genome_lib, checkIfExists: true))
             .collect()
             .set { star_genome_lib }
