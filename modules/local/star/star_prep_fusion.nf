@@ -19,33 +19,33 @@ process STAR_PREP_FUSION {
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${sample}"
     """
-    STAR --runMode alignReads \
-        --genomeDir ./${genome_lib}/ref_genome.fa.star.idx \
-        --runThreadN ${task.cpus} \
-        --readFilesIn ${R1} ${R2} \
-        --outFileNamePrefix "${prefix}" \
-        $args \
-        --twopassMode Basic \
-        --twopass1readsN -1 \
-        --outSAMunmapped Within \
-        --alignSJDBoverhangMin 10 \
-        --alignMatesGapMax 100000 \
-        --alignIntronMax 100000 \
-        --alignSJstitchMismatchNmax 5 -1 5 5 \
-        --alignInsertionFlush Right \
-        --alignSplicedMateMapLminOverLmate 0 \
-        --alignSplicedMateMapLmin 30 \
-
-        --chimSegmentMin 12 \
-        --chimJunctionOverhangMin 8 \
-        --chimOutJunctionFormat 1 \
-        --outSAMattrRGline ID:GRPundef \
-        --chimMultimapScoreRange 3 \
-        --chimScoreJunctionNonGTAG -4 \
-        --chimMultimapNmax 20 \
-        --chimNonchimScoreDropMin 10 \
-        --chimFilter banGenomicN \
-        --peOverlapNbasesMin 12 \
+    STAR --runMode alignReads \\
+        --genomeDir ./${genome_lib}/ref_genome.fa.star.idx \\
+        --runThreadN ${task.cpus} \\
+        --readFilesIn ${R1} ${R2} \\
+        --outFileNamePrefix "${prefix}" \\
+        $args \\
+        --outReadsUnmapped None \\
+        --twopassMode Basic \\
+        --twopass1readsN -1 \\
+        --outSAMunmapped Within \\
+        --alignSJDBoverhangMin 10 \\
+        --alignMatesGapMax 100000 \\
+        --alignIntronMax 100000 \\
+        --alignSJstitchMismatchNmax 5 -1 5 5 \\
+        --alignInsertionFlush Right \\
+        --alignSplicedMateMapLminOverLmate 0 \\
+        --alignSplicedMateMapLmin 30 \\
+        --chimSegmentMin 12 \\
+        --chimJunctionOverhangMin 8 \\
+        --chimOutJunctionFormat 1 \\
+        --outSAMattrRGline ID:GRPundef \\
+        --chimMultimapScoreRange 3 \\
+        --chimScoreJunctionNonGTAG -4 \\
+        --chimMultimapNmax 20 \\
+        --chimNonchimScoreDropMin 10 \\
+        --chimFilter banGenomicN \\
+        --peOverlapNbasesMin 12 \\
         --peOverlapMMp 0.1
     """
 }
