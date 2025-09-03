@@ -23,7 +23,7 @@ process CICERO {
 
     Cicero.sh \\
         -n ${task.cpus} \\
-        -b $BAM \\
+        -b \${PWD}/$BAM \\
         -g ${genome} \\
         -r \${PWD}/$cicero_genome_lib \\
         $args \\

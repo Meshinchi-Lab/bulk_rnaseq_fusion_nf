@@ -15,8 +15,6 @@ process STAR_INDEX {
     script:
     def args = task.ext.args ?: ''
     """
-    set -eou 
-
     mkdir \$PWD/GenomeDir
     STAR --runThreadN ${task.cpus} \\
         --runMode genomeGenerate \\
